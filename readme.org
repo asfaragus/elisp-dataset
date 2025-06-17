@@ -1,9 +1,8 @@
-#+TITLE: elisp-dataset
+#+TITLE: elisp-dataset: A dataset of Emacs Lisp examples for fine-tuning LLM
 #+AUTHOR: Asfaragus
 #+DATE: <2025-06-17>
 #+OPTIONS: toc:nil
 
-* elisp-dataset: A dataset of Emacs Lisp examples for fine-tuning LLM
 
 This repository provides a structured dataset for fine-tuning large
 language models (LLMs) on Emacs Lisp (elisp) through instruction
@@ -77,14 +76,14 @@ times.
 
 * Repository Contents
 
-- =elisp-dataset.org= :: Instruction-tuning examples in readable Org format.
+- =elisp-dataset.org= : Instruction-tuning examples in readable Org format.
 
-- =elisp-dataset.csv= :: Machine-learning-ready CSV file (fields:
+- =elisp-dataset.csv= : Machine-learning-ready CSV file (fields:
   instruction, input, output).
 
-- =utils.el= :: Emacs Lisp utility for exporting the dataset to CSV.
+- =utils.el= : Emacs Lisp utility for exporting the dataset to CSV.
 
-- =readme.org= :: This documentation file.
+- =readme.org= : This documentation file.
 
 * How to Export the Dataset
 
@@ -136,9 +135,9 @@ This dataset is released under the =GPLv3= License.
 
 This repo is hosted both on GitLab and GitHub:
 
-- =GitLab= :: https://gitlab.com/asfaragus/elisp-dataset
+- =GitLab= : https://gitlab.com/asfaragus/elisp-dataset
 
-- =GitHub= :: https://github.com/asfaragus/elisp-dataset
+- =GitHub= : https://github.com/asfaragus/elisp-dataset
 
 Pull requests with new examples or improvements to the utilities are
 welcome!

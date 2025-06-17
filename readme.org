@@ -1,4 +1,4 @@
-#+TITLE: elisp-dataset: A dataset of Emacs Lisp examples for fine-tuning LLM
+#+TITLE: elisp-dataset: A dataset of Emacs Lisp examples for fine-tuning LLMs
 #+AUTHOR: Asfaragus
 #+DATE: <2025-06-17>
 #+OPTIONS: toc:nil
@@ -7,23 +7,23 @@
 This repository provides a structured dataset for fine-tuning large
 language models (LLMs) on Emacs Lisp (elisp) through instruction
 tuning. Each example is crafted with a natural language instruction
-and an associated function implementation. This projects has two main
+and an associated function implementation. This project has two main
 goals:
 
 1. To help models better understand and generate idiomatic elisp code
    when given high-level tasks.
 
-2. To increase the usefulness of the local fine-tuned LLM in the user
+2. To increase the usefulness of the local fine-tuned LLMs in the user
    workflows.
 
 
 Emacs Lisp is a niche language, therefore the first goal of this
-project is to increase the proficiency of the LLM with the Emacs Lisp
+project is to increase the proficiency of the LLMs with the Emacs Lisp
 language.
 
-The privacy aspect and the cost-wise advantages of the local LLM
+The privacy aspect and the cost-wise advantages of the local LLMs
 cannot be overstated. Therefore, the second goal of the project is to
-help users take advantage of the local LLM and preserve privacy while
+help users take advantage of the local LLMs and preserve privacy while
 cutting personal costs.
 
 * Dataset Highlights

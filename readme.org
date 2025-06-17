@@ -1,0 +1,155 @@
+#+TITLE: elisp-dataset
+#+AUTHOR: Asfaragus
+#+DATE: <2025-06-17>
+#+OPTIONS: toc:nil
+
+* elisp-dataset: A dataset of Emacs Lisp examples for fine-tuning LLM
+
+This repository provides a structured dataset for fine-tuning large
+language models (LLMs) on Emacs Lisp (elisp) through instruction
+tuning. Each example is crafted with a natural language instruction
+and an associated function implementation. This projects has two main
+goals:
+
+1. To help models better understand and generate idiomatic elisp code
+   when given high-level tasks.
+
+2. To increase the usefulness of the local fine-tuned LLM in the user
+   workflows.
+
+
+Emacs Lisp is a niche language, therefore the first goal of this
+project is to increase the proficiency of the LLM with the Emacs Lisp
+language.
+
+The privacy aspect and the cost-wise advantages of the local LLM
+cannot be overstated. Therefore, the second goal of the project is to
+help users take advantage of the local LLM and preserve privacy while
+cutting personal costs.
+
+* Dataset Highlights
+
+- Written in Org-mode, easily readable and editable within Emacs.
+
+- Each entry is structured into:
+  - A task *instruction*
+  - Optional *input*
+  - A full elisp *output* (function, comment, and usage)
+
+- The example that including error messages should include only the
+  relevant info in order to minimize noise.
+
+- Includes a utility script to convert the Org file into a CSV format
+  suitable for machine learning workflows.
+
+* Dataset Example
+
+#+begin_example
+* Example 1: Count character occurrences
+** instruction
+
+Count the character occurrences in the buffer.
+
+** input
+
+** output
+
+Here is a function for counting occurrences in the buffer. I have
+provided a shortcut as well, in case you need to run the function many
+times.
+
+#+begin_src elisp
+(defun count-char-occurrences-in-buffer (char)
+  "Count the number of occurrences of CHAR in the current buffer and display the result."
+  (interactive "cEnter character: ")
+  (save-excursion
+    (goto-char (point-min))
+    (let* ((count 0)
+          (case-fold-search nil)) ; Make search case-sensitive
+      (while (search-forward (char-to-string char) nil t)
+        (setq count (1+ count)))
+      (message "The character '%c' occurs %d times in the buffer." char count)
+      count)))
+
+(global-set-key (kbd "C-c o") 'count-char-occurrences-in-buffer)
+#+end_src
+#+end_example
+
+* Repository Contents
+
+- =elisp-dataset.org= :: Instruction-tuning examples in readable Org format.
+
+- =elisp-dataset.csv= :: Machine-learning-ready CSV file (fields:
+  instruction, input, output).
+
+- =utils.el= :: Emacs Lisp utility for exporting the dataset to CSV.
+
+- =readme.org= :: This documentation file.
+
+* How to Export the Dataset
+
+If you modify the =elisp-dataset.org= file you can use the =org-to-json=
+function from the =utils.el= file in order to make a CSV export.
+
+1. Open Emacs and evaluate =utils.el=:
+
+   #+begin_src emacs-lisp
+   (load-file "utils.el")
+   #+end_src
+
+2. Open the =elisp-dataset.org= file and then use =M-x
+   elisp-dataset-export-to-csv= to export to the CSV format to a
+   temporary buffer.
+
+3. Save the overwrite the =elisp-dataset.csv= file, or save the file in
+   a different location.
+
+* Fine-tuning LLMs and using them in Emacs
+
+The exported CSV can be loaded using standard tools like pandas or
+Hugging Face's `datasets`:
+
+#+begin_src python
+import pandas as pd
+df = pd.read_csv("dataset.csv")
+#+end_src
+
+Or:
+
+#+begin_src python
+from datasets import load_dataset
+dataset = load_dataset("csv", data_files="dataset.csv")
+#+end_src
+
+You can also rely on [[https://github.com/unslothai/notebooks][Unsloth]] notebooks for fine-tuning purposes.
+Local LLMs can be installed on your machines through the [[https://ollama.com/][Ollama]]
+service.
+
+Once your LLM is installed in Ollama, you can access it directly from
+Emacs using a package such as [[https://github.com/karthink/gptel][gptel]] or similar.
+
+* License
+
+This dataset is released under the =GPLv3= License.
+
+* Contributing
+
+This repo is hosted both on GitLab and GitHub:
+
+- =GitLab= :: https://gitlab.com/asfaragus/elisp-dataset
+
+- =GitHub= :: https://github.com/asfaragus/elisp-dataset
+
+Pull requests with new examples or improvements to the utilities are
+welcome!
+
+For the code examples, please follow the current structure:
+
+- Start each example with a heading like =* Example N: Task Description=
+- Use =** instruction=, =** input=, and =** output= sections under each.
+- Keep functions self-contained and documented.
+
+* Contact
+
+For feedback or collaboration, feel free to open an issue on GitHub or
+contact me directly.

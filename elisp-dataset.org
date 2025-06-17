@@ -4551,55 +4551,55 @@ This code generates a template for a Bash script that accepts command-line optio
   (interactive)
   (let* ((buffer (generate-new-buffer "script.sh")))
     (switch-to-buffer buffer)
-    (insert "#!/bin/bash\n\n")
-    (insert "# Description: Brief description of the script\n\n")
-    (insert "# Function to display help message\n")
-    (insert "function show_help() {\n")
-    (insert "    echo \"Usage: ${0##*/} [-h] [-f FILE] [-v]\"\n")
-    (insert "    echo\n")
-    (insert "    echo \"    -h          Display this help message\"\n")
-    (insert "    echo \"    -f FILE     Specify the file to process\"\n")
-    (insert "    echo \"    -v          Enable verbose mode\"\n")
-    (insert "}\n\n")
-    (insert "# Initialize variables\n")
-    (insert "file=\"\"\n")
-    (insert "verbose=0\n\n")
-    (insert "# Parse command line options\n")
-    (insert "while getopts \"hvf:\" opt; do\n")
-    (insert "    case $opt in\n")
-    (insert "        h)\n")
-    (insert "            show_help\n")
-    (insert "            exit 0\n")
-    (insert "            ;;\n")
-    (insert "        f)\n")
-    (insert "            file=$OPTARG\n")
-    (insert "            ;;\n")
-    (insert "        v)\n")
-    (insert "            verbose=1\n")
-    (insert "            ;;\n")
-    (insert "        *)\n")
-    (insert "            show_help >&2\n")
-    (insert "            exit 1\n")
-    (insert "            ;;\n")
-    (insert "    esac\n")
-    (insert "done\n\n")
-    (insert "# Check if the file option was provided\n")
-    (insert "if [ -z \"$file\" ]; then\n")
-    (insert "    echo \"Error: -f FILE is required.\" >&2\n")
-    (insert "    show_help >&2\n")
-    (insert "    exit 1\n")
-    (insert "fi\n\n")
-    (insert "# Enable verbose mode if requested\n")
-    (insert "if [ $verbose -eq 1 ]; then\n")
-    (insert "    set -x\n")
-    (insert "fi\n\n")
-    (insert "# Your script logic here\n")
-    (insert "echo \"Processing file: $file\"\n")
-    (insert "echo \"Verbose mode: $verbose\"\n\n")
-    (insert "# Disable verbose mode\n")
-    (insert "if [ $verbose -eq 1 ]; then\n")
-    (insert "    set +x\n")
-    (insert "fi\n")
+    (insert "#!/bin/bash\n\n"
+        "# Description: Brief description of the script\n\n"
+        "# Function to display help message\n"
+        "function show_help() {\n"
+        "    echo \"Usage: ${0##*/} [-h] [-f FILE] [-v]\"\n"
+        "    echo\n"
+        "    echo \"    -h          Display this help message\"\n"
+        "    echo \"    -f FILE     Specify the file to process\"\n"
+        "    echo \"    -v          Enable verbose mode\"\n"
+        "}\n\n"
+        "# Initialize variables\n"
+        "file=\"\"\n"
+        "verbose=0\n\n"
+        "# Parse command line options\n"
+        "while getopts \"hvf:\" opt; do\n"
+        "    case $opt in\n"
+        "        h)\n"
+        "            show_help\n"
+        "            exit 0\n"
+        "            ;;\n"
+        "        f)\n"
+        "            file=$OPTARG\n"
+        "            ;;\n"
+        "        v)\n"
+        "            verbose=1\n"
+        "            ;;\n"
+        "        *)\n"
+        "            show_help >&2\n"
+        "            exit 1\n"
+        "            ;;\n"
+        "    esac\n"
+        "done\n\n"
+        "# Check if the file option was provided\n"
+        "if [ -z \"$file\" ]; then\n"
+        "    echo \"Error: -f FILE is required.\" >&2\n"
+        "    show_help >&2\n"
+        "    exit 1\n"
+        "fi\n\n"
+        "# Enable verbose mode if requested\n"
+        "if [ $verbose -eq 1 ]; then\n"
+        "    set -x\n"
+        "fi\n\n"
+        "# Your script logic here\n"
+        "echo \"Processing file: $file\"\n"
+        "echo \"Verbose mode: $verbose\"\n\n"
+        "# Disable verbose mode\n"
+        "if [ $verbose -eq 1 ]; then\n"
+        "    set +x\n"
+        "fi\n")
     (sh-mode)))
 
 ;; execute
@@ -15041,55 +15041,55 @@ Understood! The following block of code sets up a function that opens a new buff
   (interactive)
   (let* ((buffer (generate-new-buffer "script.sh")))
     (switch-to-buffer buffer)
-    (insert "#!/bin/bash\n\n")
-    (insert "# Description: Brief description of the script\n\n")
-    (insert "# Function to display help message\n")
-    (insert "function show_help() {\n")
-    (insert "    echo \"Usage: ${0##*/} [-h] [-f FILE] [-v]\"\n")
-    (insert "    echo\n")
-    (insert "    echo \"    -h          Display this help message\"\n")
-    (insert "    echo \"    -f FILE     Specify the file to process\"\n")
-    (insert "    echo \"    -v          Enable verbose mode\"\n")
-    (insert "}\n\n")
-    (insert "# Initialize variables\n")
-    (insert "file=\"\"\n")
-    (insert "verbose=0\n\n")
-    (insert "# Parse command line options\n")
-    (insert "while getopts \"hvf:\" opt; do\n")
-    (insert "    case $opt in\n")
-    (insert "        h)\n")
-    (insert "            show_help\n")
-    (insert "            exit 0\n")
-    (insert "            ;;\n")
-    (insert "        f)\n")
-    (insert "            file=$OPTARG\n")
-    (insert "            ;;\n")
-    (insert "        v)\n")
-    (insert "            verbose=1\n")
-    (insert "            ;;\n")
-    (insert "        *)\n")
-    (insert "            show_help >&2\n")
-    (insert "            exit 1\n")
-    (insert "            ;;\n")
-    (insert "    esac\n")
-    (insert "done\n\n")
-    (insert "# Check if the file option was provided\n")
-    (insert "if [ -z \"$file\" ]; then\n")
-    (insert "    echo \"Error: -f FILE is required.\" >&2\n")
-    (insert "    show_help >&2\n")
-    (insert "    exit 1\n")
-    (insert "fi\n\n")
-    (insert "# Enable verbose mode if requested\n")
-    (insert "if [ $verbose -eq 1 ]; then\n")
-    (insert "    set -x\n")
-    (insert "fi\n\n")
-    (insert "# Your script logic here\n")
-    (insert "echo \"Processing file: $file\"\n")
-    (insert "echo \"Verbose mode: $verbose\"\n\n")
-    (insert "# Disable verbose mode\n")
-    (insert "if [ $verbose -eq 1 ]; then\n")
-    (insert "    set +x\n")
-    (insert "fi\n")
+    (insert "#!/bin/bash\n\n"
+        "# Description: Brief description of the script\n\n"
+        "# Function to display help message\n"
+        "function show_help() {\n"
+        "    echo \"Usage: ${0##*/} [-h] [-f FILE] [-v]\"\n"
+        "    echo\n"
+        "    echo \"    -h          Display this help message\"\n"
+        "    echo \"    -f FILE     Specify the file to process\"\n"
+        "    echo \"    -v          Enable verbose mode\"\n"
+        "}\n\n"
+        "# Initialize variables\n"
+        "file=\"\"\n"
+        "verbose=0\n\n"
+        "# Parse command line options\n"
+        "while getopts \"hvf:\" opt; do\n"
+        "    case $opt in\n"
+        "        h)\n"
+        "            show_help\n"
+        "            exit 0\n"
+        "            ;;\n"
+        "        f)\n"
+        "            file=$OPTARG\n"
+        "            ;;\n"
+        "        v)\n"
+        "            verbose=1\n"
+        "            ;;\n"
+        "        *)\n"
+        "            show_help >&2\n"
+        "            exit 1\n"
+        "            ;;\n"
+        "    esac\n"
+        "done\n\n"
+        "# Check if the file option was provided\n"
+        "if [ -z \"$file\" ]; then\n"
+        "    echo \"Error: -f FILE is required.\" >&2\n"
+        "    show_help >&2\n"
+        "    exit 1\n"
+        "fi\n\n"
+        "# Enable verbose mode if requested\n"
+        "if [ $verbose -eq 1 ]; then\n"
+        "    set -x\n"
+        "fi\n\n"
+        "# Your script logic here\n"
+        "echo \"Processing file: $file\"\n"
+        "echo \"Verbose mode: $verbose\"\n\n"
+        "# Disable verbose mode\n"
+        "if [ $verbose -eq 1 ]; then\n"
+        "    set +x\n"
+        "fi\n")
     (sh-mode)))
 
 ;; execute
@@ -42192,56 +42192,57 @@ The following error happens when I run the code: (void-variable buffer). Please 
   (interactive)
   (let* ((buffer (generate-new-buffer "script.sh"))))
     (switch-to-buffer buffer)
-    (insert "#!/bin/bash\n\n")
-    (insert "# Description: Brief description of the script\n\n")
-    (insert "# Function to display help message\n")
-    (insert "function show_help() {\n")
-    (insert "    echo \"Usage: ${0##*/} [-h] [-f FILE] [-v]\"\n")
-    (insert "    echo\n")
-    (insert "    echo \"    -h          Display this help message\"\n")
-    (insert "    echo \"    -f FILE     Specify the file to process\"\n")
-    (insert "    echo \"    -v          Enable verbose mode\"\n")
-    (insert "}\n\n")
-    (insert "# Initialize variables\n")
-    (insert "file=\"\"\n")
-    (insert "verbose=0\n\n")
-    (insert "# Parse command line options\n")
-    (insert "while getopts \"hvf:\" opt; do\n")
-    (insert "    case $opt in\n")
-    (insert "        h)\n")
-    (insert "            show_help\n")
-    (insert "            exit 0\n")
-    (insert "            ;;\n")
-    (insert "        f)\n")
-    (insert "            file=$OPTARG\n")
-    (insert "            ;;\n")
-    (insert "        v)\n")
-    (insert "            verbose=1\n")
-    (insert "            ;;\n")
-    (insert "        *)\n")
-    (insert "            show_help >&2\n")
-    (insert "            exit 1\n")
-    (insert "            ;;\n")
-    (insert "    esac\n")
-    (insert "done\n\n")
-    (insert "# Check if the file option was provided\n")
-    (insert "if [ -z \"$file\" ]; then\n")
-    (insert "    echo \"Error: -f FILE is required.\" >&2\n")
-    (insert "    show_help >&2\n")
-    (insert "    exit 1\n")
-    (insert "fi\n\n")
-    (insert "# Enable verbose mode if requested\n")
-    (insert "if [ $verbose -eq 1 ]; then\n")
-    (insert "    set -x\n")
-    (insert "fi\n\n")
-    (insert "# Your script logic here\n")
-    (insert "echo \"Processing file: $file\"\n")
-    (insert "echo \"Verbose mode: $verbose\"\n\n")
-    (insert "# Disable verbose mode\n")
-    (insert "if [ $verbose -eq 1 ]; then\n")
-    (insert "    set +x\n")
-    (insert "fi\n")
+    (insert "#!/bin/bash\n\n"
+        "# Description: Brief description of the script\n\n"
+        "# Function to display help message\n"
+        "function show_help() {\n"
+        "    echo \"Usage: ${0##*/} [-h] [-f FILE] [-v]\"\n"
+        "    echo\n"
+        "    echo \"    -h          Display this help message\"\n"
+        "    echo \"    -f FILE     Specify the file to process\"\n"
+        "    echo \"    -v          Enable verbose mode\"\n"
+        "}\n\n"
+        "# Initialize variables\n"
+        "file=\"\"\n"
+        "verbose=0\n\n"
+        "# Parse command line options\n"
+        "while getopts \"hvf:\" opt; do\n"
+        "    case $opt in\n"
+        "        h)\n"
+        "            show_help\n"
+        "            exit 0\n"
+        "            ;;\n"
+        "        f)\n"
+        "            file=$OPTARG\n"
+        "            ;;\n"
+        "        v)\n"
+        "            verbose=1\n"
+        "            ;;\n"
+        "        *)\n"
+        "            show_help >&2\n"
+        "            exit 1\n"
+        "            ;;\n"
+        "    esac\n"
+        "done\n\n"
+        "# Check if the file option was provided\n"
+        "if [ -z \"$file\" ]; then\n"
+        "    echo \"Error: -f FILE is required.\" >&2\n"
+        "    show_help >&2\n"
+        "    exit 1\n"
+        "fi\n\n"
+        "# Enable verbose mode if requested\n"
+        "if [ $verbose -eq 1 ]; then\n"
+        "    set -x\n"
+        "fi\n\n"
+        "# Your script logic here\n"
+        "echo \"Processing file: $file\"\n"
+        "echo \"Verbose mode: $verbose\"\n\n"
+        "# Disable verbose mode\n"
+        "if [ $verbose -eq 1 ]; then\n"
+        "    set +x\n"
+        "fi\n")
     (sh-mode))
+
 
 ;; execute
 (insert-bash-script-template)
@@ -42258,55 +42259,55 @@ The error `void-variable buffer` states that the variable `buffer` has not been 
   (interactive)
   (let* ((buffer (generate-new-buffer "script.sh")))
     (switch-to-buffer buffer)
-    (insert "#!/bin/bash\n\n")
-    (insert "# Description: Brief description of the script\n\n")
-    (insert "# Function to display help message\n")
-    (insert "function show_help() {\n")
-    (insert "    echo \"Usage: ${0##*/} [-h] [-f FILE] [-v]\"\n")
-    (insert "    echo\n")
-    (insert "    echo \"    -h          Display this help message\"\n")
-    (insert "    echo \"    -f FILE     Specify the file to process\"\n")
-    (insert "    echo \"    -v          Enable verbose mode\"\n")
-    (insert "}\n\n")
-    (insert "# Initialize variables\n")
-    (insert "file=\"\"\n")
-    (insert "verbose=0\n\n")
-    (insert "# Parse command line options\n")
-    (insert "while getopts \"hvf:\" opt; do\n")
-    (insert "    case $opt in\n")
-    (insert "        h)\n")
-    (insert "            show_help\n")
-    (insert "            exit 0\n")
-    (insert "            ;;\n")
-    (insert "        f)\n")
-    (insert "            file=$OPTARG\n")
-    (insert "            ;;\n")
-    (insert "        v)\n")
-    (insert "            verbose=1\n")
-    (insert "            ;;\n")
-    (insert "        *)\n")
-    (insert "            show_help >&2\n")
-    (insert "            exit 1\n")
-    (insert "            ;;\n")
-    (insert "    esac\n")
-    (insert "done\n\n")
-    (insert "# Check if the file option was provided\n")
-    (insert "if [ -z \"$file\" ]; then\n")
-    (insert "    echo \"Error: -f FILE is required.\" >&2\n")
-    (insert "    show_help >&2\n")
-    (insert "    exit 1\n")
-    (insert "fi\n\n")
-    (insert "# Enable verbose mode if requested\n")
-    (insert "if [ $verbose -eq 1 ]; then\n")
-    (insert "    set -x\n")
-    (insert "fi\n\n")
-    (insert "# Your script logic here\n")
-    (insert "echo \"Processing file: $file\"\n")
-    (insert "echo \"Verbose mode: $verbose\"\n\n")
-    (insert "# Disable verbose mode\n")
-    (insert "if [ $verbose -eq 1 ]; then\n")
-    (insert "    set +x\n")
-    (insert "fi\n")
+    (insert "#!/bin/bash\n\n"
+        "# Description: Brief description of the script\n\n"
+        "# Function to display help message\n"
+        "function show_help() {\n"
+        "    echo \"Usage: ${0##*/} [-h] [-f FILE] [-v]\"\n"
+        "    echo\n"
+        "    echo \"    -h          Display this help message\"\n"
+        "    echo \"    -f FILE     Specify the file to process\"\n"
+        "    echo \"    -v          Enable verbose mode\"\n"
+        "}\n\n"
+        "# Initialize variables\n"
+        "file=\"\"\n"
+        "verbose=0\n\n"
+        "# Parse command line options\n"
+        "while getopts \"hvf:\" opt; do\n"
+        "    case $opt in\n"
+        "        h)\n"
+        "            show_help\n"
+        "            exit 0\n"
+        "            ;;\n"
+        "        f)\n"
+        "            file=$OPTARG\n"
+        "            ;;\n"
+        "        v)\n"
+        "            verbose=1\n"
+        "            ;;\n"
+        "        *)\n"
+        "            show_help >&2\n"
+        "            exit 1\n"
+        "            ;;\n"
+        "    esac\n"
+        "done\n\n"
+        "# Check if the file option was provided\n"
+        "if [ -z \"$file\" ]; then\n"
+        "    echo \"Error: -f FILE is required.\" >&2\n"
+        "    show_help >&2\n"
+        "    exit 1\n"
+        "fi\n\n"
+        "# Enable verbose mode if requested\n"
+        "if [ $verbose -eq 1 ]; then\n"
+        "    set -x\n"
+        "fi\n\n"
+        "# Your script logic here\n"
+        "echo \"Processing file: $file\"\n"
+        "echo \"Verbose mode: $verbose\"\n\n"
+        "# Disable verbose mode\n"
+        "if [ $verbose -eq 1 ]; then\n"
+        "    set +x\n"
+        "fi\n")
     (sh-mode)))
 
 ;; execute

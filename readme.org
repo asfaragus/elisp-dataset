@@ -150,5 +150,5 @@ For the code examples, please follow the current structure:
 
 * Contact
 
-For feedback or collaboration, feel free to open an issue on GitHub or
-contact me directly.
+For feedback or collaboration, feel free to open an issue or contact
+me directly.

@@ -852,15 +852,13 @@ Here is a function for drawing a rectangle using asterisks. Please run it with '
   (let* ((width 10)
         (height 5))
     ;; Insert the top border of the rectangle
-    (insert (make-string width ?*))
-    (insert "\n")
+    (insert (make-string width ?*) "\n")
     ;; Insert the sides of the rectangle
     (dotimes (_ (1- height))
       (insert "*" (make-string (- width 2) ? ) "*\n"))
     ;; Insert the bottom border of the rectangle if height is more than 1
     (when (> height 1)
-      (insert (make-string width ?*))
-      (insert "\n"))))
+      (insert (make-string width ?*) "\n"))))
 #+end_src
 
 * Example 29: Indent the whole buffer
@@ -1238,8 +1236,8 @@ Understood. In the next block you will find the code for this purpose.  You can 
       (goto-char (point-max))
       (if project-timer-active
           (progn
-            (insert (format "Ended:   %s\nDirectory: %s\n" current-time current-dir))
-            (insert "-----------------------\n")
+            (insert (format "Ended:   %s\nDirectory: %s\n" current-time current-dir)
+                    "-----------------------\n")
             (message "Project timer ended at: %s" current-time))
         (insert (format "Started: %s\nDirectory: %s\n" current-time current-dir))
         (message "Project timer started at: %s" current-time))
@@ -2130,8 +2128,8 @@ Sure thing! Please evaluate the next block of code in order to fetch the latest 
 (defun fetch-latest-spacex-launch ()
   "Fetch the latest SpaceX launch data and display it in an Org buffer."
   (interactive)
-  (let* ((url "https://api.spacexdata.com/v4/launches/latest"))
-    (lexical-let ((output-buffer (get-buffer-create "*Latest SpaceX Launch*")))
+  (let* ((url "https://api.spacexdata.com/v4/launches/latest")
+            (output-buffer (get-buffer-create "*Latest SpaceX Launch*")))
       (url-retrieve
        url
        (lambda (status)
@@ -2149,15 +2147,16 @@ Sure thing! Please evaluate the next block of code in order to fetch the latest 
                    (launchpad-id (alist-get 'launchpad json-data)))
                (with-current-buffer output-buffer
                  (erase-buffer)
-                 (insert (format "#+TITLE: Latest SpaceX Launch\n\n"))
-                 (insert (format "* Launch Name: %s\n" name))
-                 (insert (format "* Launch Date (UTC): %s\n" date))
-                 (insert (format "* Details: %s\n" details))
-                 (insert (format "* Rocket ID: %s\n" rocket-id))
-                 (insert (format "* Launchpad ID: %s\n" launchpad-id))
+                 (insert
+                    (format "#+TITLE: Latest SpaceX Launch\n\n")
+                    (format "* Launch Name: %s\n" name)
+                    (format "* Launch Date (UTC): %s\n" date)
+                    (format "* Details: %s\n" details)
+                    (format "* Rocket ID: %s\n" rocket-id)
+                    (format "* Launchpad ID: %s\n" launchpad-id))
                  (org-mode)
                  (goto-char (point-min))
-                 (display-buffer output-buffer))))))))))
+                 (display-buffer output-buffer)))))))))
 
 ;; execute
 (fetch-latest-spacex-launch)
@@ -2304,35 +2303,33 @@ Please evaluate the code block below in order to download and display the most r
 (require 'url-http)
 
 (defun fetch-github-commits (owner repo)
-  "Fetch recent commits from the specified GitHub repository OWNER/REPO and display them in an Org buffer."
-  (interactive "sEnter GitHub Owner: \nsEnter GitHub Repo: ")
-  (let* ((url (format "https://api.github.com/repos/%s/%s/commits" owner repo)))
-    (lexical-let ((owner owner)
-                  (repo repo)
-                  (output-buffer (get-buffer-create (format "*GitHub Commits for %s/%s*" owner repo))))
-      (url-retrieve
-       url
-       (lambda (status)
-         (let* ((json-object-type 'alist)
-               (json-array-type 'list)
-               (json-key-type 'symbol))
-           (goto-char (point-min))
-           (re-search-forward "\n\n")
-           (let* ((json-data (json-read)))
-             (with-current-buffer output-buffer
-               (erase-buffer)
-               (insert (format "#+TITLE: Recent Commits for %s/%s\n\n" owner repo))
-               (dolist (commit json-data)
-                 (let* ((commit-data (alist-get 'commit commit))
-                        (message (alist-get 'message commit-data))
-                        (author (alist-get 'name (alist-get 'author commit-data)))
-                        (date (alist-get 'date (alist-get 'author commit-data))))
-                   (insert (format "* Commit: %s\n" message))
-                   (insert (format "  Author: %s\n" author))
-                   (insert (format "  Date: %s\n\n" date))))
-               (org-mode)
-               (goto-char (point-min))
-               (display-buffer output-buffer)))))))))
+        "Fetch recent commits from the specified GitHub repository OWNER/REPO and display them in an Org buffer."
+        (interactive "sEnter GitHub Owner: \nsEnter GitHub Repo: ")
+        (let* ((url (format "https://api.github.com/repos/%s/%s/commits" owner repo))
+                (output-buffer (get-buffer-create (format "*GitHub Commits for %s/%s*" owner repo))))
+            (url-retrieve
+            url
+            (lambda (status)
+                (let* ((json-object-type 'alist)
+                    (json-array-type 'list)
+                    (json-key-type 'symbol))
+                (goto-char (point-min))
+                (re-search-forward "\n\n")
+                (let* ((json-data (json-read)))
+                    (with-current-buffer output-buffer
+                    (erase-buffer)
+                    (insert (format "#+TITLE: Recent Commits for %s/%s\n\n" owner repo))
+                    (dolist (commit json-data)
+                        (let* ((commit-data (alist-get 'commit commit))
+                                (message (alist-get 'message commit-data))
+                                (author (alist-get 'name (alist-get 'author commit-data)))
+                                (date (alist-get 'date (alist-get 'author commit-data))))
+                        (insert (format "* Commit: %s\n" message)
+                                (format "  Author: %s\n" author)
+                                (format "  Date: %s\n\n" date))))
+                    (org-mode)
+                    (goto-char (point-min))
+                    (display-buffer output-buffer))))))))
 
 ;; execute
 (fetch-github-commits "emacs-mirror" "emacs")
@@ -2471,8 +2468,8 @@ Sure thing! I will generate a set of function for fetching the top stories from 
 (defun fetch-hacker-news-top-stories ()
   "Fetch top stories from Hacker News and display them in an Org buffer."
   (interactive)
-  (let* ((url "https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty"))
-    (lexical-let ((output-buffer (get-buffer-create "*Hacker News Top Stories*")))
+  (let* ((url "https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty")
+        (output-buffer (get-buffer-create "*Hacker News Top Stories*")))
       (url-retrieve
        url
        (lambda (status)
@@ -2487,12 +2484,11 @@ Sure thing! I will generate a set of function for fetching the top stories from 
                (insert "#+TITLE: Hacker News Top Stories\n\n")
                (dolist (id (seq-take top-story-ids 10))
                  (fetch-hacker-news-story id output-buffer))
-               (org-mode)))))))))
+               (org-mode))))))))
 
 (defun fetch-hacker-news-story (id output-buffer)
   "Fetch a Hacker News story by ID and insert it into OUTPUT-BUFFER."
   (let* ((url (format "https://hacker-news.firebaseio.com/v0/item/%d.json?print=pretty" id)))
-    (lexical-let ((output-buffer output-buffer))
       (url-retrieve
        url
        (lambda (status)
@@ -2507,15 +2503,15 @@ Sure thing! I will generate a set of function for fetching the top stories from 
                      (author (alist-get 'by story))
                      (score (alist-get 'score story))
                      (url (alist-get 'url story)))
-                 (insert (format "* %s\n" title))
-                 (insert (format "  Author: %s\n" author))
-                 (insert (format "  Score: %d\n" score))
+                 (insert (format "* %s\n" title)
+                        (format "  Author: %s\n" author)
+                        (format "  Score: %d\n" score))
                  (when url
                    (insert (format "  URL: %s\n" url)))
                  (insert "\n")))
              (org-mode)
              (goto-char (point-min))
-             (display-buffer output-buffer))))))))
+             (display-buffer output-buffer)))))))
 
 ;; execute
 (fetch-hacker-news-top-stories)
@@ -3171,13 +3167,13 @@ Please run the code below to fetch the latest statistics about the COVID-19 and 
                      (today-cases (alist-get 'todayCases covid-data))
                      (today-deaths (alist-get 'todayDeaths covid-data))
                      (today-recovered (alist-get 'todayRecovered covid-data)))
-                 (insert (format "* Total Cases: %d\n" cases))
-                 (insert (format "* Total Deaths: %d\n" deaths))
-                 (insert (format "* Total Recovered: %d\n" recovered))
-                 (insert (format "* Active Cases: %d\n" active))
-                 (insert (format "* Cases Today: %d\n" today-cases))
-                 (insert (format "* Deaths Today: %d\n" today-deaths))
-                 (insert (format "* Recovered Today: %d\n" today-recovered)))
+                 (insert (format "* Total Cases: %d\n" cases)
+                        (format "* Total Deaths: %d\n" deaths)
+                        (format "* Total Recovered: %d\n" recovered)
+                        (format "* Active Cases: %d\n" active)
+                        (format "* Cases Today: %d\n" today-cases)
+                        (format "* Deaths Today: %d\n" today-deaths)
+                        (format "* Recovered Today: %d\n" today-recovered)))
                (org-mode)
                (goto-char (point-min))
                (display-buffer output-buffer)))))))))
@@ -3232,8 +3228,8 @@ Here is the code for fetching the top five results about "Japanese culture" from
                  (dolist (result results)
                    (let* ((url (nth 0 result))
                          (title (nth 1 result)))
-                     (insert (format "* Title: %s\n" (replace-regexp-in-string "<[^>]+>" "" title)))
-                     (insert (format "* Link: [[%s][%s]]\n\n" url url))))
+                     (insert (format "* Title: %s\n" (replace-regexp-in-string "<[^>]+>" "" title))
+                            (format "* Link: [[%s][%s]]\n\n" url url))))
                  (org-mode)
                  (goto-char (point-min))
                  (org-display-inline-images)
@@ -3353,8 +3349,7 @@ No problem! I will provide a generic function for prepending text content to the
                            (insert-file-contents file)
                            (buffer-string))))
     (with-temp-buffer
-      (insert text)
-      (insert file-content)
+      (insert text file-contents)
       (write-region (point-min) (point-max) file))
     (message "Prepended text to file: %s" file)))
 
@@ -4352,10 +4347,10 @@ Here is a function that fetches the top 5 popular movies from an online API and 
                          (genres (alist-get 'genres movie))
                          (summary (alist-get 'summary movie))
                          (url (alist-get 'url movie)))
-                     (insert (format "* Movie: %s\n" name))
-                     (insert (format "  - Genres: %s\n" (string-join genres ", ")))
-                     (insert (format "  - Summary: %s\n" (replace-regexp-in-string "<[^>]*>" "" summary)))
-                     (insert (format "  - URL: [[%s][%s]]\n\n" url url))))
+                     (insert (format "* Movie: %s\n" name)
+                            (format "  - Genres: %s\n" (string-join genres ", "))
+                            (format "  - Summary: %s\n" (replace-regexp-in-string "<[^>]*>" "" summary))
+                            (format "  - URL: [[%s][%s]]\n\n" url url))))
                  (org-mode)
                  (goto-char (point-min))
                  (org-display-inline-images)
@@ -4445,17 +4440,17 @@ Understood! The following function allows you to open a new buffer, insert a bas
   (interactive)
   (let* ((buffer (generate-new-buffer "untitled.html")))
     (switch-to-buffer buffer)
-    (insert "<!DOCTYPE html>\n")
-    (insert "<html lang=\"en\">\n")
-    (insert "<head>\n")
-    (insert "    <meta charset=\"UTF-8\">\n")
-    (insert "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n")
-    (insert "    <title>Document</title>\n")
-    (insert "</head>\n")
-    (insert "<body>\n")
-    (insert "    \n")
-    (insert "</body>\n")
-    (insert "</html>\n")
+    (insert "<!DOCTYPE html>\n"
+            "<html lang=\"en\">\n"
+            "<head>\n"
+            "    <meta charset=\"UTF-8\">\n"
+            "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
+            "    <title>Document</title>\n"
+            "</head>\n"
+            "<body>\n"
+            "    \n"
+            "</body>\n"
+            "</html>\n")
     (html-mode)))
 
 ;; execute
@@ -4478,57 +4473,57 @@ Got it! The following function quickly generates a README.md template, which is 
   (interactive)
   (let* ((buffer (generate-new-buffer "README.md")))
     (switch-to-buffer buffer)
-    (insert "# Project Title\n\n")
-    (insert "One Paragraph of project description goes here.\n\n")
-    (insert "## Getting Started\n\n")
-    (insert "These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.\n\n")
-    (insert "### Prerequisites\n\n")
-    (insert "What things you need to install the software and how to install them.\n\n")
-    (insert "```\n")
-    (insert "Give examples\n")
-    (insert "```\n\n")
-    (insert "### Installing\n\n")
-    (insert "A step by step series of examples that tell you how to get a development environment running.\n\n")
-    (insert "Say what the step will be.\n\n")
-    (insert "```\n")
-    (insert "Give the example\n")
-    (insert "```\n\n")
-    (insert "And repeat.\n\n")
-    (insert "```\n")
-    (insert "until finished\n")
-    (insert "```\n\n")
-    (insert "End with an example of getting some data out of the system or using it for a little demo.\n\n")
-    (insert "## Running the tests\n\n")
-    (insert "Explain how to run the automated tests for this system.\n\n")
-    (insert "### Break down into end to end tests\n\n")
-    (insert "Explain what these tests test and why.\n\n")
-    (insert "```\n")
-    (insert "Give an example\n")
-    (insert "```\n\n")
-    (insert "### And coding style tests\n\n")
-    (insert "Explain what these tests test and why.\n\n")
-    (insert "```\n")
-    (insert "Give an example\n")
-    (insert "```\n\n")
-    (insert "## Deployment\n\n")
-    (insert "Add additional notes about how to deploy this on a live system.\n\n")
-    (insert "## Built With\n\n")
-    (insert "* [Name](https://example.com) - The framework used\n")
-    (insert "* [Name](https://example.com) - Dependency\n")
-    (insert "* [Name](https://example.com) - Another dependency\n\n")
-    (insert "## Contributing\n\n")
-    (insert "Please read [CONTRIBUTING.md](https://example.com) for details on our code of conduct, and the process for submitting pull requests to us.\n\n")
-    (insert "## Versioning\n\n")
-    (insert "We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://example.com/tags).\n\n")
-    (insert "## Authors\n\n")
-    (insert "* **Your Name** - *Initial work* - [YourWebsite](https://example.com)\n\n")
-    (insert "See also the list of [contributors](https://example.com/contributors) who participated in this project.\n\n")
-    (insert "## License\n\n")
-    (insert "This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.\n\n")
-    (insert "## Acknowledgments\n\n")
-    (insert "* Hat tip to anyone whose code was used\n")
-    (insert "* Inspiration\n")
-    (insert "* etc\n")
+    (insert "# Project Title\n\n"
+        "One Paragraph of project description goes here.\n\n"
+        "## Getting Started\n\n"
+        "These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.\n\n"
+        "### Prerequisites\n\n"
+        "What things you need to install the software and how to install them.\n\n"
+        "```\n"
+        "Give examples\n"
+        "```\n\n"
+        "### Installing\n\n"
+        "A step by step series of examples that tell you how to get a development environment running.\n\n"
+        "Say what the step will be.\n\n"
+        "```\n"
+        "Give the example\n"
+        "```\n\n"
+        "And repeat.\n\n"
+        "```\n"
+        "until finished\n"
+        "```\n\n"
+        "End with an example of getting some data out of the system or using it for a little demo.\n\n"
+        "## Running the tests\n\n"
+        "Explain how to run the automated tests for this system.\n\n"
+        "### Break down into end to end tests\n\n"
+        "Explain what these tests test and why.\n\n"
+        "```\n"
+        "Give an example\n"
+        "```\n\n"
+        "### And coding style tests\n\n"
+        "Explain what these tests test and why.\n\n"
+        "```\n"
+        "Give an example\n"
+        "```\n\n"
+        "## Deployment\n\n"
+        "Add additional notes about how to deploy this on a live system.\n\n"
+        "## Built With\n\n"
+        "* [Name](https://example.com) - The framework used\n"
+        "* [Name](https://example.com) - Dependency\n"
+        "* [Name](https://example.com) - Another dependency\n\n"
+        "## Contributing\n\n"
+        "Please read [CONTRIBUTING.md](https://example.com) for details on our code of conduct, and the process for submitting pull requests to us.\n\n"
+        "## Versioning\n\n"
+        "We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://example.com/tags).\n\n"
+        "## Authors\n\n"
+        "* **Your Name** - *Initial work* - [YourWebsite](https://example.com)\n\n"
+        "See also the list of [contributors](https://example.com/contributors) who participated in this project.\n\n"
+        "## License\n\n"
+        "This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.\n\n"
+        "## Acknowledgments\n\n"
+        "* Hat tip to anyone whose code was used\n"
+        "* Inspiration\n"
+        "* etc\n")
     (markdown-mode)))
 
 ;; execute
@@ -4622,25 +4617,25 @@ Here is the code for generating a Python script template using argparse for comm
   (interactive)
   (let* ((buffer (generate-new-buffer "script.py")))
     (switch-to-buffer buffer)
-    (insert "#!/usr/bin/env python3\n\n")
-    (insert "\"\"\"\n")
-    (insert "Description: Brief description of the script\n")
-    (insert "\"\"\"\n\n")
-    (insert "import argparse\n\n")
-    (insert "def parse_args():\n")
-    (insert "    parser = argparse.ArgumentParser(description='Description of your script')\n")
-    (insert "    parser.add_argument('-f', '--file', type=str, help='File to process')\n")
-    (insert "    parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose mode')\n")
-    (insert "    args = parser.parse_args()\n")
-    (insert "    return args\n\n")
-    (insert "def main():\n")
-    (insert "    args = parse_args()\n")
-    (insert "    if args.verbose:\n")
-    (insert "        print('Verbose mode enabled')\n")
-    (insert "    if args.file:\n")
-    (insert "        print(f'Processing file: {args.file}')\n\n")
-    (insert "if __name__ == '__main__':\n")
-    (insert "    main()\n")
+    (insert "#!/usr/bin/env python3\n\n"
+        "\"\"\"\n"
+        "Description: Brief description of the script\n"
+        "\"\"\"\n\n"
+        "import argparse\n\n"
+        "def parse_args():\n"
+        "    parser = argparse.ArgumentParser(description='Description of your script')\n"
+        "    parser.add_argument('-f', '--file', type=str, help='File to process')\n"
+        "    parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose mode')\n"
+        "    args = parser.parse_args()\n"
+        "    return args\n\n"
+        "def main():\n"
+        "    args = parse_args()\n"
+        "    if args.verbose:\n"
+        "        print('Verbose mode enabled')\n"
+        "    if args.file:\n"
+        "        print(f'Processing file: {args.file}')\n\n"
+        "if __name__ == '__main__':\n"
+        "    main()\n")
     (python-mode)))
 
 ;; execute
@@ -4857,32 +4852,32 @@ Understood! The following block of code helps you get started with writing a LaT
   (interactive)
   (let* ((buffer (generate-new-buffer "document.tex")))
     (switch-to-buffer buffer)
-    (insert "\\documentclass{article}\n")
-    (insert "\\usepackage[utf8]{inputenc}\n")
-    (insert "\\usepackage{amsmath}\n")
-    (insert "\\usepackage{graphicx}\n")
-    (insert "\\usepackage{hyperref}\n")
-    (insert "\\usepackage{geometry}\n")
-    (insert "\\geometry{a4paper, margin=1in}\n")
-    (insert "\n\\title{Your Title Here}\n")
-    (insert "\\author{Your Name}\n")
-    (insert "\\date{\\today}\n")
-    (insert "\n\\begin{document}\n")
-    (insert "\n\\maketitle\n")
-    (insert "\n\\begin{abstract}\n")
-    (insert "Your abstract here.\n")
-    (insert "\\end{abstract}\n")
-    (insert "\n\\section{Introduction}\n")
-    (insert "Your introduction here.\n")
-    (insert "\n\\section{Main Content}\n")
-    (insert "Your main content here.\n")
-    (insert "\n\\section{Conclusion}\n")
-    (insert "Your conclusion here.\n")
-    (insert "\n\\begin{thebibliography}{9}\n")
-    (insert "\\bibitem{example}\n")
-    (insert "Author, \\textit{Title}, Journal, Year.\n")
-    (insert "\\end{thebibliography}\n")
-    (insert "\n\\end{document}\n")
+    (insert "\\documentclass{article}\n"
+        "\\usepackage[utf8]{inputenc}\n"
+        "\\usepackage{amsmath}\n"
+        "\\usepackage{graphicx}\n"
+        "\\usepackage{hyperref}\n"
+        "\\usepackage{geometry}\n"
+        "\\geometry{a4paper, margin=1in}\n"
+        "\n\\title{Your Title Here}\n"
+        "\\author{Your Name}\n"
+        "\\date{\\today}\n"
+        "\n\\begin{document}\n"
+        "\n\\maketitle\n"
+        "\n\\begin{abstract}\n"
+        "Your abstract here.\n"
+        "\\end{abstract}\n"
+        "\n\\section{Introduction}\n"
+        "Your introduction here.\n"
+        "\n\\section{Main Content}\n"
+        "Your main content here.\n"
+        "\n\\section{Conclusion}\n"
+        "Your conclusion here.\n"
+        "\n\\begin{thebibliography}{9}\n"
+        "\\bibitem{example}\n"
+        "Author, \\textit{Title}, Journal, Year.\n"
+        "\\end{thebibliography}\n"
+        "\n\\end{document}\n")
     (latex-mode)))
 
 ;; execute
@@ -4905,29 +4900,29 @@ Here is the code for quickly generating a GitHub pull request (PR) template. Thi
   (interactive)
   (let* ((buffer (generate-new-buffer "PULL_REQUEST_TEMPLATE.md")))
     (switch-to-buffer buffer)
-    (insert "# Pull Request Template\n\n")
-    (insert "## Description\n")
-    (insert "Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.\n\n")
-    (insert "Fixes # (issue)\n\n")
-    (insert "## Type of change\n")
-    (insert "Please delete options that are not relevant.\n")
-    (insert "- [ ] Bug fix (non-breaking change which fixes an issue)\n")
-    (insert "- [ ] New feature (non-breaking change which adds functionality)\n")
-    (insert "- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)\n")
-    (insert "- [ ] This change requires a documentation update\n\n")
-    (insert "## How Has This Been Tested?\n")
-    (insert "Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration.\n\n")
-    (insert "- [ ] Test A\n")
-    (insert "- [ ] Test B\n\n")
-    (insert "## Checklist:\n")
-    (insert "- [ ] My code follows the style guidelines of this project\n")
-    (insert "- [ ] I have performed a self-review of my own code\n")
-    (insert "- [ ] I have commented my code, particularly in hard-to-understand areas\n")
-    (insert "- [ ] I have made corresponding changes to the documentation\n")
-    (insert "- [ ] My changes generate no new warnings\n")
-    (insert "- [ ] I have added tests that prove my fix is effective or that my feature works\n")
-    (insert "- [ ] New and existing unit tests pass locally with my changes\n")
-    (insert "- [ ] Any dependent changes have been merged and published in downstream modules\n")
+    (insert "# Pull Request Template\n\n"
+        "## Description\n"
+        "Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.\n\n"
+        "Fixes # (issue)\n\n"
+        "## Type of change\n"
+        "Please delete options that are not relevant.\n"
+        "- [ ] Bug fix (non-breaking change which fixes an issue)\n"
+        "- [ ] New feature (non-breaking change which adds functionality)\n"
+        "- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)\n"
+        "- [ ] This change requires a documentation update\n\n"
+        "## How Has This Been Tested?\n"
+        "Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration.\n\n"
+        "- [ ] Test A\n"
+        "- [ ] Test B\n\n"
+        "## Checklist:\n"
+        "- [ ] My code follows the style guidelines of this project\n"
+        "- [ ] I have performed a self-review of my own code\n"
+        "- [ ] I have commented my code, particularly in hard-to-understand areas\n"
+        "- [ ] I have made corresponding changes to the documentation\n"
+        "- [ ] My changes generate no new warnings\n"
+        "- [ ] I have added tests that prove my fix is effective or that my feature works\n"
+        "- [ ] New and existing unit tests pass locally with my changes\n"
+        "- [ ] Any dependent changes have been merged and published in downstream modules\n")
     (markdown-mode)))
 
 ;; execute
@@ -4948,15 +4943,15 @@ Understood! The following block of code provides a quick way to insert a Python 
 (defun insert-python-function-template ()
   "Insert a Python function template at the current cursor position."
   (interactive)
-  (insert "def function_name(params):\n")
-  (insert "    \"\"\"Function description.\n\n")
-  (insert "    Args:\n")
-  (insert "        params (type): Description.\n\n")
-  (insert "    Returns:\n")
-  (insert "        type: Description.\n")
-  (insert "    \"\"\"\n")
-  (insert "    # TODO: Implement function\n")
-  (insert "    pass\n"))
+  (insert "def function_name(params):\n"
+    "    \"\"\"Function description.\n\n"
+    "    Args:\n"
+    "        params (type): Description.\n\n"
+    "    Returns:\n"
+    "        type: Description.\n"
+    "    \"\"\"\n"
+    "    # TODO: Implement function\n"
+    "    pass\n"))
 ;; to execute M-x insert-python-function-template
 #+end_src
 
@@ -5049,17 +5044,17 @@ Here’s a function that allows you to quickly create a TODO list template in Or
   (let* ((buffer-name "*TODO List*"))
     (switch-to-buffer (get-buffer-create buffer-name))
     (erase-buffer)
-    (insert "#+TITLE: TODO List\n\n")
-    (insert "* Summary\n\n")
-    (insert "* High Priority\n")
-    (insert "** TODO [#A] Task 1\n")
-    (insert "** TODO [#A] Task 2\n\n")
-    (insert "* Medium Priority\n")
-    (insert "** TODO [#B] Task 1\n")
-    (insert "** TODO [#B] Task 2\n\n")
-    (insert "* Low Priority\n")
-    (insert "** TODO [#C] Task 1\n")
-    (insert "** TODO [#C] Task 2\n\n")
+    (insert "#+TITLE: TODO List\n\n"
+        "* Summary\n\n"
+        "* High Priority\n"
+        "** TODO [#A] Task 1\n"
+        "** TODO [#A] Task 2\n\n"
+        "* Medium Priority\n"
+        "** TODO [#B] Task 1\n"
+        "** TODO [#B] Task 2\n\n"
+        "* Low Priority\n"
+        "** TODO [#C] Task 1\n"
+        "** TODO [#C] Task 2\n\n")
     (org-mode)
     (goto-char (point-min))))
 
@@ -5098,9 +5093,9 @@ Here’s a set of functions designed to help you track the time spent on your ta
              (start-time time-tracking-start-time)
              (duration (float-time (time-subtract end-time start-time))))
         (with-temp-buffer
-          (insert (format "Task started at: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S" start-time)))
-          (insert (format "Task ended at: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S" end-time)))
-          (insert (format "Duration: %.2f seconds\n\n" duration))
+          (insert (format "Task started at: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S" start-time))
+                (format "Task ended at: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S" end-time))
+                (format "Duration: %.2f seconds\n\n" duration))
           (append-to-file (point-min) (point-max) time-tracking-log-file))
         (setq time-tracking-start-time nil)
         (message "Time tracking stopped. Duration: %.2f seconds" duration))
@@ -5130,15 +5125,15 @@ Here is a function designed to help you quickly insert a standardized header int
         (description (read-string "Description: "))
         (usage (read-string "Usage: ")))
     (goto-char (point-min))
-    (insert (format "#!/bin/bash\n"))
-    (insert (format "# %s\n" (make-string 70 ?#)))
-    (insert (format "# Script Name: %s\n" script-name))
-    (insert (format "# Author: %s\n" author))
-    (insert (format "# Date: %s\n" date))
-    (insert (format "# Description: %s\n" description))
-    (insert (format "# Usage: %s\n" usage))
-    (insert (format "# %s\n" (make-string 70 ?#)))
-    (insert "\n")))
+    (insert (format "#!/bin/bash\n")
+        (format "# %s\n" (make-string 70 ?#))
+        (format "# Script Name: %s\n" script-name)
+        (format "# Author: %s\n" author)
+        (format "# Date: %s\n" date)
+        (format "# Description: %s\n" description)
+        (format "# Usage: %s\n" usage)
+        (format "# %s\n" (make-string 70 ?#))
+        "\n")))
 
 (global-set-key (kbd "C-c h") 'insert-script-header)
 #+end_src
@@ -5450,13 +5445,13 @@ Understood! This function automates the insertion of a standardized header comme
   (interactive)
   (goto-char (point-min))
   (insert
-   ";; =============================\n"
-   ";;       File Header Comment    \n"
-   ";; =============================\n"
-   ";; Description: \n"
-   ";; Author: \n"
-   ";; Created: \n"
-   ";; =============================\n\n"))
+    ";; =============================\n"
+    ";;       File Header Comment    \n"
+    ";; =============================\n"
+    ";; Description: \n"
+    ";; Author: \n"
+    ";; Created: \n"
+    ";; =============================\n\n"))
 
 ;; Bind the function to a key for easy access
 (global-set-key (kbd "C-c h") 'insert-header-comment-block)
@@ -5708,8 +5703,7 @@ The provided code allows you to download a CSV file from a specified URL and dis
     (with-current-buffer output-buffer
       (erase-buffer)
       (org-mode)
-      (insert "#+TITLE: CSV as Org Table\n\n")
-      (insert "|-\n") ;; Start org table
+      (insert "#+TITLE: CSV as Org Table\n\n" "|-\n") ;; Insert title and start org table
       (with-temp-buffer
         (insert-file-contents temp-file)
         (goto-char (point-min))
@@ -6032,11 +6026,11 @@ This function fetches and displays detailed information about a book using its I
                        (publish-date (alist-get 'publish_date book-data))
                        (number-of-pages (alist-get 'number_of_pages book-data))
                        (cover-url (alist-get 'cover book-data)))
-                   (insert (format "* Title: %s\n" title))
-                   (insert (format "* Authors: %s\n" (string-join authors ", ")))
-                   (insert (format "* Publishers: %s\n" (string-join publishers ", ")))
-                   (insert (format "* Publish Date: %s\n" publish-date))
-                   (insert (format "* Number of Pages: %d\n" number-of-pages))
+                   (insert (format "* Title: %s\n" title)
+                        (format "* Authors: %s\n" (string-join authors ", "))
+                        (format "* Publishers: %s\n" (string-join publishers ", "))
+                        (format "* Publish Date: %s\n" publish-date)
+                        (format "* Number of Pages: %d\n" number-of-pages))
                    (when cover-url
                      (insert (format "* Cover URL: %s\n" (alist-get 'large cover-url))))))
                  (org-mode)
@@ -6077,9 +6071,9 @@ This function fetches a random joke from the web and displays it in an Org buffe
            (let* ((json-data (json-read)))
              (with-current-buffer output-buffer
                (erase-buffer)
-               (insert (format "#+TITLE: Random Joke\n\n"))
-               (insert (format "* Setup: %s\n" (alist-get 'setup json-data)))
-               (insert (format "* Punchline: %s\n" (alist-get 'punchline json-data)))
+               (insert (format "#+TITLE: Random Joke\n\n")
+                    (format "* Setup: %s\n" (alist-get 'setup json-data))
+                    (format "* Punchline: %s\n" (alist-get 'punchline json-data)))
                (org-mode)
                (goto-char (point-min))
                (display-buffer output-buffer)))))))))
@@ -6130,8 +6124,8 @@ Let me know if you have any other questions.
                   (comic-alt (alist-get 'alt json-data)))
              (with-current-buffer output-buffer
                (erase-buffer)
-               (insert (format "#+TITLE: XKCD Comic #%s - %s\n\n" comic-num comic-title))
-               (insert (format "* Alt Text: %s\n\n" comic-alt))
+               (insert (format "#+TITLE: XKCD Comic #%s - %s\n\n" comic-num comic-title)
+                    (format "* Alt Text: %s\n\n" comic-alt))
                (let* ((image-file (concat temporary-file-directory "xkcd.png")))
                  (url-copy-file comic-url image-file t)
                  (insert (format "[[file:%s]]\n" image-file))
@@ -6193,8 +6187,8 @@ Feel free to test it out and expand your knowledge with some random trivia!
                  (let* ((question-text (alist-get 'question question))
                        (correct-answer (alist-get 'correct_answer question))
                        (incorrect-answers (alist-get 'incorrect_answers question)))
-                   (insert (format "* Question: %s\n" question-text))
-                   (insert (format "  - Correct Answer: %s\n" correct-answer))
+                   (insert (format "* Question: %s\n" question-text)
+                        (format "  - Correct Answer: %s\n" correct-answer))
                    (dolist (answer incorrect-answers)
                      (insert (format "  - Incorrect Answer: %s\n" answer)))
                    (insert "\n")))
@@ -6254,15 +6248,15 @@ Let me know if you have any other questions!
            (let* ((json-data (json-read)))
              (with-current-buffer output-buffer
                (erase-buffer)
-               (insert (format "#+TITLE: GitHub Repository Information: %s/%s\n\n" owner repo))
-               (insert (format "* Name: %s\n" (alist-get 'name json-data)))
-               (insert (format "* Description: %s\n" (alist-get 'description json-data)))
-               (insert (format "* Owner: %s\n" (alist-get 'login (alist-get 'owner json-data))))
-               (insert (format "* Stars: %d\n" (alist-get 'stargazers_count json-data)))
-               (insert (format "* Forks: %d\n" (alist-get 'forks_count json-data)))
-               (insert (format "* Open Issues: %d\n" (alist-get 'open_issues_count json-data)))
-               (insert (format "* Language: %s\n" (alist-get 'language json-data)))
-               (insert (format "* URL: %s\n" (alist-get 'html_url json-data)))
+               (insert (format "#+TITLE: GitHub Repository Information: %s/%s\n\n" owner repo)
+                    (format "* Name: %s\n" (alist-get 'name json-data))
+                    (format "* Description: %s\n" (alist-get 'description json-data))
+                    (format "* Owner: %s\n" (alist-get 'login (alist-get 'owner json-data)))
+                    (format "* Stars: %d\n" (alist-get 'stargazers_count json-data))
+                    (format "* Forks: %d\n" (alist-get 'forks_count json-data))
+                    (format "* Open Issues: %d\n" (alist-get 'open_issues_count json-data))
+                    (format "* Language: %s\n" (alist-get 'language json-data))
+                    (format "* URL: %s\n" (alist-get 'html_url json-data)))
                (org-mode)
                (goto-char (point-min))
                (display-buffer output-buffer)))))))))
@@ -6312,8 +6306,8 @@ buffer. No need to open any external applications!
              (let* ((image-url (alist-get 'message json-data)))
                (with-current-buffer output-buffer
                  (erase-buffer)
-                 (insert (format "#+TITLE: Random Dog Image\n\n"))
-                 (insert (format "[[file:/tmp/%s]]\n" (file-name-nondirectory (url-unhex-string image-url))))
+                 (insert (format "#+TITLE: Random Dog Image\n\n")
+                        (format "[[file:/tmp/%s]]\n" (file-name-nondirectory (url-unhex-string image-url))))
                  (url-copy-file image-url (concat "/tmp/" (file-name-nondirectory (url-unhex-string image-url))) t)
                  (org-mode)
                  (goto-char (point-min))
@@ -6896,10 +6890,10 @@ This code provides a function named 'count-elisp-metrics' to analyze Emacs Lisp 
             (setq lines (1+ lines)))
           (forward-line 1))))
     (with-temp-file (expand-file-name "code-metrics.txt" directory)
-      (insert (format "Code Metrics Report for %s\n" directory))
-      (insert (format "Total Functions: %d\n" functions))
-      (insert (format "Total Variables: %d\n" variables))
-      (insert (format "Total Lines of Code: %d\n" lines)))
+      (insert (format "Code Metrics Report for %s\n" directory)
+            (format "Total Functions: %d\n" functions)
+            (format "Total Variables: %d\n" variables)
+            (format "Total Lines of Code: %d\n" lines)))
     (message "Code metrics report generated in code-metrics.txt")))
 
 ;; Usage example
@@ -7076,8 +7070,8 @@ This function allows you to generate a weekly report from tasks in an Org file t
                   (deadline (org-element-property :deadline task)))
               (push (list :title title :status status :deadline deadline) tasks)))))
       (with-temp-file report-file
-        (insert "#+TITLE: Weekly Report\n\n")
-        (insert "* Report for tasks tagged with :" tag ":\n\n")
+        (insert "#+TITLE: Weekly Report\n\n"
+                "* Report for tasks tagged with :" tag ":\n\n")
         (dolist (task tasks)
           (insert (format "- **%s** - Status: %s, Deadline: %s\n"
                           (plist-get task :title)
@@ -7340,11 +7334,12 @@ This function generates a report from an Org mode file, counting the number of h
             (setq code-blocks (1+ code-blocks)))))
         (forward-line 1))
       (with-temp-file report-file
-        (insert (format "Org File Report for %s\n" org-file))
-        (insert (format "Total Headings: %d\n" headings))
-        (insert (format "Total TODOs: %d\n" todos))
-        (insert (format "Total DONEs: %d\n" dones))
-        (insert (format "Total Code Blocks: %d\n" code-blocks)))
+        (insert (format "Org File Report for %s\n" org-file)
+            (format "Total Headings: %d\n" headings)
+            (format "Total TODOs: %d\n" todos)
+            (format "Total DONEs: %d\n" dones)
+            (format "Total Code Blocks: %d\n" code-blocks))
+        )
       (message "Report generated in %s" report-file))))
 
 ;; Usage example
@@ -7489,8 +7484,8 @@ The next code block includes a function called 'org-todo-report-by-priority' tha
            ((string= priority "C") (push heading priority-c))
            (t (push heading no-priority))))))
     (with-temp-file report-file
-      (insert "TODO Items by Priority Report:\n\n")
-      (insert "* Priority A\n")
+      (insert "TODO Items by Priority Report:\n\n"
+              "* Priority A\n")
       (dolist (item priority-a) (insert item "\n"))
       (insert "\n* Priority B\n")
       (dolist (item priority-b) (insert item "\n"))
@@ -7731,8 +7726,8 @@ Here is a comprehensive set of functions for managing a to-do list within the '*
       (progn
         (switch-to-buffer "*To-Do List*")
         (erase-buffer)
-        (insert (format "%-5s %s\n" "Done" "Item"))
-        (insert (make-string 50 ?-) "\n")
+        (insert (format "%-5s %s\n" "Done" "Item")
+                (make-string 50 ?-) "\n")
         (dolist (item todo-list)
           (insert (format "%-5s %s\n"
                           (if (cdr item) "[x]" "[ ]")
@@ -9001,8 +8996,7 @@ To help you summarize the word counts of Org files in a directory, this function
           (setq total-word-count (+ total-word-count word-count))
           (push (cons (file-name-nondirectory text-file) word-count) file-word-counts))))
     (with-temp-file output-file
-      (insert (format "Total word count: %d\n\n" total-word-count))
-      (insert "Word count per file:\n")
+      (insert (format "Total word count: %d\n\n" total-word-count) "Word count per file:\n")
       (dolist (file-word-count (reverse file-word-counts))
         (insert (format "%s: %d\n" (car file-word-count) (cdr file-word-count)))))
     (message "Word count summary saved to %s" output-file)))
@@ -9283,12 +9277,12 @@ This function generates a detailed task report from an Org mode file, summarizin
            ((string= status "WAITING") (setq waiting-count (1+ waiting-count)))
            (t (setq other-count (1+ other-count))))))
       (with-temp-file report-file
-        (insert (format "Org Task Report for %s\n\n" org-file))
-        (insert (format "TODO tasks: %d\n" todo-count))
-        (insert (format "DONE tasks: %d\n" done-count))
-        (insert (format "IN-PROGRESS tasks: %d\n" in-progress-count))
-        (insert (format "WAITING tasks: %d\n" waiting-count))
-        (insert (format "Other tasks: %d\n" other-count))))))
+        (insert (format "Org Task Report for %s\n\n" org-file)
+                (format "TODO tasks: %d\n" todo-count)
+                (format "DONE tasks: %d\n" done-count)
+                (format "IN-PROGRESS tasks: %d\n" in-progress-count)
+                (format "WAITING tasks: %d\n" waiting-count)
+                (format "Other tasks: %d\n" other-count))))))
 
 (defun view-org-task-report (org-file)
   "Generate and view the task report for ORG-FILE."
@@ -9998,8 +9992,8 @@ named '*Git Log Summary*'.
         (cmd (format "git log --after=\"%s\" --before=\"%s\" --pretty=format:\"%%h %%an %%s\"" start-date end-date)))
     (with-current-buffer buffer
       (erase-buffer)
-      (insert (format "Git Log Summary from %s to %s\n\n" start-date end-date))
-      (insert (shell-command-to-string cmd))
+      (insert (format "Git Log Summary from %s to %s\n\n" start-date end-date)
+            (shell-command-to-string cmd))
       (goto-char (point-min))
       (org-mode))
     (display-buffer buffer)))
@@ -11105,15 +11099,13 @@ In order to draw a rectangle at the current point in the buffer, this function i
   (let* ((width 15)
         (height 10))
     ;; Insert the top border of the rectangle
-    (insert (make-string width ?*))
-    (insert "\n")
+    (insert (make-string width ?*) "\n")
     ;; Insert the sides of the rectangle
     (dotimes (_ (1- height))
       (insert "*" (make-string (- width 2) ? ) "*\n"))
     ;; Insert the bottom border of the rectangle if height is more than 1
     (when (> height 1)
-      (insert (make-string width ?*))
-      (insert "\n"))))
+      (insert (make-string width ?*) "\n"))))
 #+end_src
 
 * Example 329: Indent the whole buffer
@@ -12488,37 +12480,38 @@ launch information directly within Emacs.
 (require 'url)
 (require 'url-http)
 
-(defun fetch-latest-spacex-launch ()
-  "Fetch the latest SpaceX launch data and display it in an Org buffer."
-  (interactive)
-  (let* ((url "https://api.spacexdata.com/v4/launches/latest"))
-    (lexical-let ((output-buffer (get-buffer-create "*Latest SpaceX Launch*")))
-      (url-retrieve
-       url
-       (lambda (status)
-         (let* ((json-object-type 'alist)
-               (json-array-type 'list)
-               (json-key-type 'symbol))
-           (goto-char (point-min))
-           (re-search-forward "\n\n")
-           (let* ((json-data (json-read)))
-             ;; (message "JSON Data: %s" json-data)  ;; Debugging message
-             (let* ((name (alist-get 'name json-data))
-                   (date (alist-get 'date_utc json-data))
-                   (details (alist-get 'details json-data))
-                   (rocket-id (alist-get 'rocket json-data))
-                   (launchpad-id (alist-get 'launchpad json-data)))
-               (with-current-buffer output-buffer
-                 (erase-buffer)
-                 (insert (format "#+TITLE: Latest SpaceX Launch\n\n"))
-                 (insert (format "* Launch Name: %s\n" name))
-                 (insert (format "* Launch Date (UTC): %s\n" date))
-                 (insert (format "* Details: %s\n" details))
-                 (insert (format "* Rocket ID: %s\n" rocket-id))
-                 (insert (format "* Launchpad ID: %s\n" launchpad-id))
-                 (org-mode)
-                 (goto-char (point-min))
-                 (display-buffer output-buffer))))))))))
+    (defun fetch-latest-spacex-launch ()
+        "Fetch the latest SpaceX launch data and display it in an Org buffer."
+        (interactive)
+        (let* ((url "https://api.spacexdata.com/v4/launches/latest")
+                    (output-buffer (get-buffer-create "*Latest SpaceX Launch*")))
+            (url-retrieve
+            url
+            (lambda (status)
+                (let* ((json-object-type 'alist)
+                    (json-array-type 'list)
+                    (json-key-type 'symbol))
+                (goto-char (point-min))
+                (re-search-forward "\n\n")
+                (let* ((json-data (json-read)))
+                    ;; (message "JSON Data: %s" json-data)  ;; Debugging message
+                    (let* ((name (alist-get 'name json-data))
+                        (date (alist-get 'date_utc json-data))
+                        (details (alist-get 'details json-data))
+                        (rocket-id (alist-get 'rocket json-data))
+                        (launchpad-id (alist-get 'launchpad json-data)))
+                    (with-current-buffer output-buffer
+                        (erase-buffer)
+                        (insert
+                            (format "#+TITLE: Latest SpaceX Launch\n\n")
+                            (format "* Launch Name: %s\n" name)
+                            (format "* Launch Date (UTC): %s\n" date)
+                            (format "* Details: %s\n" details)
+                            (format "* Rocket ID: %s\n" rocket-id)
+                            (format "* Launchpad ID: %s\n" launchpad-id))
+                        (org-mode)
+                        (goto-char (point-min))
+                        (display-buffer output-buffer)))))))))
 
 ;; execute
 (fetch-latest-spacex-launch)
@@ -12698,35 +12691,33 @@ applications or web pages.
 (require 'url-http)
 
 (defun fetch-github-commits (owner repo)
-  "Fetch recent commits from the specified GitHub repository OWNER/REPO and display them in an Org buffer."
-  (interactive "sEnter GitHub Owner: \nsEnter GitHub Repo: ")
-  (let* ((url (format "https://api.github.com/repos/%s/%s/commits" owner repo)))
-    (lexical-let ((owner owner)
-                  (repo repo)
-                  (output-buffer (get-buffer-create (format "*GitHub Commits for %s/%s*" owner repo))))
-      (url-retrieve
-       url
-       (lambda (status)
-         (let* ((json-object-type 'alist)
-               (json-array-type 'list)
-               (json-key-type 'symbol))
-           (goto-char (point-min))
-           (re-search-forward "\n\n")
-           (let* ((json-data (json-read)))
-             (with-current-buffer output-buffer
-               (erase-buffer)
-               (insert (format "#+TITLE: Recent Commits for %s/%s\n\n" owner repo))
-               (dolist (commit json-data)
-                 (let* ((commit-data (alist-get 'commit commit))
-                        (message (alist-get 'message commit-data))
-                        (author (alist-get 'name (alist-get 'author commit-data)))
-                        (date (alist-get 'date (alist-get 'author commit-data))))
-                   (insert (format "* Commit: %s\n" message))
-                   (insert (format "  Author: %s\n" author))
-                   (insert (format "  Date: %s\n\n" date))))
-               (org-mode)
-               (goto-char (point-min))
-               (display-buffer output-buffer)))))))))
+        "Fetch recent commits from the specified GitHub repository OWNER/REPO and display them in an Org buffer."
+        (interactive "sEnter GitHub Owner: \nsEnter GitHub Repo: ")
+        (let* ((url (format "https://api.github.com/repos/%s/%s/commits" owner repo))
+                (output-buffer (get-buffer-create (format "*GitHub Commits for %s/%s*" owner repo))))
+            (url-retrieve
+            url
+            (lambda (status)
+                (let* ((json-object-type 'alist)
+                    (json-array-type 'list)
+                    (json-key-type 'symbol))
+                (goto-char (point-min))
+                (re-search-forward "\n\n")
+                (let* ((json-data (json-read)))
+                    (with-current-buffer output-buffer
+                    (erase-buffer)
+                    (insert (format "#+TITLE: Recent Commits for %s/%s\n\n" owner repo))
+                    (dolist (commit json-data)
+                        (let* ((commit-data (alist-get 'commit commit))
+                                (message (alist-get 'message commit-data))
+                                (author (alist-get 'name (alist-get 'author commit-data)))
+                                (date (alist-get 'date (alist-get 'author commit-data))))
+                        (insert (format "* Commit: %s\n" message)
+                                    (format "  Author: %s\n" author)
+                                    (format "  Date: %s\n\n" date))))
+                    (org-mode)
+                    (goto-char (point-min))
+                    (display-buffer output-buffer))))))))
 
 ;; execute
 ;; (fetch-github-commits "emacs-mirror" "emacs")
@@ -12932,9 +12923,9 @@ You can start the function any time you need using
                      (author (alist-get 'by story))
                      (score (alist-get 'score story))
                      (url (alist-get 'url story)))
-                 (insert (format "* %s\n" title))
-                 (insert (format "  Author: %s\n" author))
-                 (insert (format "  Score: %d\n" score))
+                 (insert (format "* %s\n" title)
+                        (format "  Author: %s\n" author)
+                        (format "  Score: %d\n" score))
                  (when url
                    (insert (format "  URL: %s\n" url)))
                  (insert "\n")))
@@ -13341,8 +13332,7 @@ easy to track what's happening within the directory in real time.
                             (lambda (proc output)
                               (with-current-buffer log-buffer
                                 (goto-char (point-max))
-                                (insert output)
-                                (insert "\n"))))))))
+                                (insert output "\n"))))))))
 
 ;; Usage example
 (monitor-directory-changes "~/test" "*Directory-Changes-Log*")
@@ -13625,13 +13615,13 @@ fetch-latest-covid19-stats` to keep your data up-to-date.
                      (today-cases (alist-get 'todayCases covid-data))
                      (today-deaths (alist-get 'todayDeaths covid-data))
                      (today-recovered (alist-get 'todayRecovered covid-data)))
-                 (insert (format "* Total Cases: %d\n" cases))
-                 (insert (format "* Total Deaths: %d\n" deaths))
-                 (insert (format "* Total Recovered: %d\n" recovered))
-                 (insert (format "* Active Cases: %d\n" active))
-                 (insert (format "* Cases Today: %d\n" today-cases))
-                 (insert (format "* Deaths Today: %d\n" today-deaths))
-                 (insert (format "* Recovered Today: %d\n" today-recovered)))
+                 (insert (format "* Total Cases: %d\n" cases)
+                        (format "* Total Deaths: %d\n" deaths)
+                        (format "* Total Recovered: %d\n" recovered)
+                        (format "* Active Cases: %d\n" active)
+                        (format "* Cases Today: %d\n" today-cases)
+                        (format "* Deaths Today: %d\n" today-deaths)
+                        (format "* Recovered Today: %d\n" today-recovered)))
                (org-mode)
                (goto-char (point-min))
                (display-buffer output-buffer)))))))))
@@ -13690,8 +13680,8 @@ wish. The results will be displayed in a similar format.
                  (dolist (result results)
                    (let* ((url (nth 0 result))
                          (title (nth 1 result)))
-                     (insert (format "* Title: %s\n" (replace-regexp-in-string "<[^>]+>" "" title)))
-                     (insert (format "* Link: [[%s][%s]]\n\n" url url))))
+                     (insert (format "* Title: %s\n" (replace-regexp-in-string "<[^>]+>" "" title))
+                            (format "* Link: [[%s][%s]]\n\n" url url))))
                  (org-mode)
                  (goto-char (point-min))
                  (org-display-inline-images)
@@ -13839,8 +13829,7 @@ interactively.
                            (insert-file-contents file)
                            (buffer-string))))
     (with-temp-buffer
-      (insert text)
-      (insert file-content)
+      (insert text file-content)
       (write-region (point-min) (point-max) file))
     (message "Prepended text to file: %s" file)))
 
@@ -14840,10 +14829,10 @@ In order to fetch the top 5 popular movies from the JSON API and display them in
                          (genres (alist-get 'genres movie))
                          (summary (alist-get 'summary movie))
                          (url (alist-get 'url movie)))
-                     (insert (format "* Movie: %s\n" name))
-                     (insert (format "  - Genres: %s\n" (string-join genres ", ")))
-                     (insert (format "  - Summary: %s\n" (replace-regexp-in-string "<[^>]*>" "" summary)))
-                     (insert (format "  - URL: [[%s][%s]]\n\n" url url))))
+                     (insert (format "* Movie: %s\n" name)
+                            (format "  - Genres: %s\n" (string-join genres ", "))
+                            (format "  - Summary: %s\n" (replace-regexp-in-string "<[^>]*>" "" summary))
+                            (format "  - URL: [[%s][%s]]\n\n" url url))))
                  (org-mode)
                  (goto-char (point-min))
                  (org-display-inline-images)
@@ -14933,17 +14922,17 @@ Understood! The following block of code creates a new buffer, inserts an HTML5 b
   (interactive)
   (let* ((buffer (generate-new-buffer "untitled.html")))
     (switch-to-buffer buffer)
-    (insert "<!DOCTYPE html>\n")
-    (insert "<html lang=\"en\">\n")
-    (insert "<head>\n")
-    (insert "    <meta charset=\"UTF-8\">\n")
-    (insert "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n")
-    (insert "    <title>Document</title>\n")
-    (insert "</head>\n")
-    (insert "<body>\n")
-    (insert "    \n")
-    (insert "</body>\n")
-    (insert "</html>\n")
+    (insert "<!DOCTYPE html>\n"
+        "<html lang=\"en\">\n"
+        "<head>\n"
+        "    <meta charset=\"UTF-8\">\n"
+        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
+        "    <title>Document</title>\n"
+        "</head>\n"
+        "<body>\n"
+        "    \n"
+        "</body>\n"
+        "</html>\n")
     (html-mode)))
 
 ;; execute
@@ -14966,58 +14955,57 @@ Got it! In the next block of code, I've created a function that opens a new buff
   (interactive)
   (let* ((buffer (generate-new-buffer "README.md")))
     (switch-to-buffer buffer)
-    (insert "# Project Title\n\n")
-    (insert "One Paragraph of project description goes here.\n\n")
-    (insert "## Getting Started\n\n")
-    (insert "These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.\n\n")
-    (insert "### Prerequisites\n\n")
-    (insert "What things you need to install the software and how to install
-them.\n\n")
-    (insert "```\n")
-    (insert "Give examples\n")
-    (insert "```\n\n")
-    (insert "### Installing\n\n")
-    (insert "A step by step series of examples that tell you how to get a development environment running.\n\n")
-    (insert "Say what the step will be.\n\n")
-    (insert "```\n")
-    (insert "Give the example\n")
-    (insert "```\n\n")
-    (insert "And repeat.\n\n")
-    (insert "```\n")
-    (insert "until finished\n")
-    (insert "```\n\n")
-    (insert "End with an example of getting some data out of the system or using it for a little demo.\n\n")
-    (insert "## Running the tests\n\n")
-    (insert "Explain how to run the automated tests for this system.\n\n")
-    (insert "### Break down into end to end tests\n\n")
-    (insert "Explain what these tests test and why.\n\n")
-    (insert "```\n")
-    (insert "Give an example\n")
-    (insert "```\n\n")
-    (insert "### And coding style tests\n\n")
-    (insert "Explain what these tests test and why.\n\n")
-    (insert "```\n")
-    (insert "Give an example\n")
-    (insert "```\n\n")
-    (insert "## Deployment\n\n")
-    (insert "Add additional notes about how to deploy this on a live system.\n\n")
-    (insert "## Built With\n\n")
-    (insert "* [Name](https://example.com) - The framework used\n")
-    (insert "* [Name](https://example.com) - Dependency\n")
-    (insert "* [Name](https://example.com) - Another dependency\n\n")
-    (insert "## Contributing\n\n")
-    (insert "Please read [CONTRIBUTING.md](https://example.com) for details on our code of conduct, and the process for submitting pull requests to us.\n\n")
-    (insert "## Versioning\n\n")
-    (insert "We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://example.com/tags).\n\n")
-    (insert "## Authors\n\n")
-    (insert "* **Your Name** - *Initial work* - [YourWebsite](https://example.com)\n\n")
-    (insert "See also the list of [contributors](https://example.com/contributors) who participated in this project.\n\n")
-    (insert "## License\n\n")
-    (insert "This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.\n\n")
-    (insert "## Acknowledgments\n\n")
-    (insert "* Hat tip to anyone whose code was used\n")
-    (insert "* Inspiration\n")
-    (insert "* etc\n")
+    (insert "# Project Title\n\n"
+        "One Paragraph of project description goes here.\n\n"
+        "## Getting Started\n\n"
+        "These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.\n\n"
+        "### Prerequisites\n\n"
+        "What things you need to install the software and how to install them.\n\n"
+        "```\n"
+        "Give examples\n"
+        "```\n\n"
+        "### Installing\n\n"
+        "A step by step series of examples that tell you how to get a development environment running.\n\n"
+        "Say what the step will be.\n\n"
+        "```\n"
+        "Give the example\n"
+        "```\n\n"
+        "And repeat.\n\n"
+        "```\n"
+        "until finished\n"
+        "```\n\n"
+        "End with an example of getting some data out of the system or using it for a little demo.\n\n"
+        "## Running the tests\n\n"
+        "Explain how to run the automated tests for this system.\n\n"
+        "### Break down into end to end tests\n\n"
+        "Explain what these tests test and why.\n\n"
+        "```\n"
+        "Give an example\n"
+        "```\n\n"
+        "### And coding style tests\n\n"
+        "Explain what these tests test and why.\n\n"
+        "```\n"
+        "Give an example\n"
+        "```\n\n"
+        "## Deployment\n\n"
+        "Add additional notes about how to deploy this on a live system.\n\n"
+        "## Built With\n\n"
+        "* [Name](https://example.com) - The framework used\n"
+        "* [Name](https://example.com) - Dependency\n"
+        "* [Name](https://example.com) - Another dependency\n\n"
+        "## Contributing\n\n"
+        "Please read [CONTRIBUTING.md](https://example.com) for details on our code of conduct, and the process for submitting pull requests to us.\n\n"
+        "## Versioning\n\n"
+        "We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://example.com/tags).\n\n"
+        "## Authors\n\n"
+        "* **Your Name** - *Initial work* - [YourWebsite](https://example.com)\n\n"
+        "See also the list of [contributors](https://example.com/contributors) who participated in this project.\n\n"
+        "## License\n\n"
+        "This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.\n\n"
+        "## Acknowledgments\n\n"
+        "* Hat tip to anyone whose code was used\n"
+        "* Inspiration\n"
+        "* etc\n")
     (markdown-mode)))
 
 ;; execute
@@ -15112,25 +15100,25 @@ Got it! In the next block of code, I've provided an Emacs Lisp function that ope
   (interactive)
   (let* ((buffer (generate-new-buffer "script.py")))
     (switch-to-buffer buffer)
-    (insert "#!/usr/bin/env python3\n\n")
-    (insert "\"\"\"\n")
-    (insert "Description: Brief description of the script\n")
-    (insert "\"\"\"\n\n")
-    (insert "import argparse\n\n")
-    (insert "def parse_args():\n")
-    (insert "    parser = argparse.ArgumentParser(description='Description of your script')\n")
-    (insert "    parser.add_argument('-f', '--file', type=str, help='File to process')\n")
-    (insert "    parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose mode')\n")
-    (insert "    args = parser.parse_args()\n")
-    (insert "    return args\n\n")
-    (insert "def main():\n")
-    (insert "    args = parse_args()\n")
-    (insert "    if args.verbose:\n")
-    (insert "        print('Verbose mode enabled')\n")
-    (insert "    if args.file:\n")
-    (insert "        print(f'Processing file: {args.file}')\n\n")
-    (insert "if __name__ == '__main__':\n")
-    (insert "    main()\n")
+    (insert "#!/usr/bin/env python3\n\n"
+            "\"\"\"\n"
+            "Description: Brief description of the script\n"
+            "\"\"\"\n\n"
+            "import argparse\n\n"
+            "def parse_args():\n"
+            "    parser = argparse.ArgumentParser(description='Description of your script')\n"
+            "    parser.add_argument('-f', '--file', type=str, help='File to process')\n"
+            "    parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose mode')\n"
+            "    args = parser.parse_args()\n"
+            "    return args\n\n"
+            "def main():\n"
+            "    args = parse_args()\n"
+            "    if args.verbose:\n"
+            "        print('Verbose mode enabled')\n"
+            "    if args.file:\n"
+            "        print(f'Processing file: {args.file}')\n\n"
+            "if __name__ == '__main__':\n"
+            "    main()\n")
     (python-mode)))
 
 ;; execute
@@ -15350,32 +15338,32 @@ Got it! In the next block of code, you'll find a function to create a LaTeX docu
   (interactive)
   (let* ((buffer (generate-new-buffer "document.tex")))
     (switch-to-buffer buffer)
-    (insert "\\documentclass{article}\n")
-    (insert "\\usepackage[utf8]{inputenc}\n")
-    (insert "\\usepackage{amsmath}\n")
-    (insert "\\usepackage{graphicx}\n")
-    (insert "\\usepackage{hyperref}\n")
-    (insert "\\usepackage{geometry}\n")
-    (insert "\\geometry{a4paper, margin=1in}\n")
-    (insert "\n\\title{Your Title Here}\n")
-    (insert "\\author{Your Name}\n")
-    (insert "\\date{\\today}\n")
-    (insert "\n\\begin{document}\n")
-    (insert "\n\\maketitle\n")
-    (insert "\n\\begin{abstract}\n")
-    (insert "Your abstract here.\n")
-    (insert "\\end{abstract}\n")
-    (insert "\n\\section{Introduction}\n")
-    (insert "Your introduction here.\n")
-    (insert "\n\\section{Main Content}\n")
-    (insert "Your main content here.\n")
-    (insert "\n\\section{Conclusion}\n")
-    (insert "Your conclusion here.\n")
-    (insert "\n\\begin{thebibliography}{9}\n")
-    (insert "\\bibitem{example}\n")
-    (insert "Author, \\textit{Title}, Journal, Year.\n")
-    (insert "\\end{thebibliography}\n")
-    (insert "\n\\end{document}\n")
+    (insert "\\documentclass{article}\n"
+        "\\usepackage[utf8]{inputenc}\n"
+        "\\usepackage{amsmath}\n"
+        "\\usepackage{graphicx}\n"
+        "\\usepackage{hyperref}\n"
+        "\\usepackage{geometry}\n"
+        "\\geometry{a4paper, margin=1in}\n"
+        "\n\\title{Your Title Here}\n"
+        "\\author{Your Name}\n"
+        "\\date{\\today}\n"
+        "\n\\begin{document}\n"
+        "\n\\maketitle\n"
+        "\n\\begin{abstract}\n"
+        "Your abstract here.\n"
+        "\\end{abstract}\n"
+        "\n\\section{Introduction}\n"
+        "Your introduction here.\n"
+        "\n\\section{Main Content}\n"
+        "Your main content here.\n"
+        "\n\\section{Conclusion}\n"
+        "Your conclusion here.\n"
+        "\n\\begin{thebibliography}{9}\n"
+        "\\bibitem{example}\n"
+        "Author, \\textit{Title}, Journal, Year.\n"
+        "\\end{thebibliography}\n"
+        "\n\\end{document}\n")
     (latex-mode)))
 
 ;; execute
@@ -15398,30 +15386,31 @@ Got it! In the next block of code, you'll find a function that generates a GitHu
   (interactive)
   (let* ((buffer (generate-new-buffer "PULL_REQUEST_TEMPLATE.md")))
     (switch-to-buffer buffer)
-    (insert "# Pull Request Template\n\n")
-    (insert "## Description\n")
-    (insert "Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.\n\n")
-    (insert "Fixes # (issue)\n\n")
-    (insert "## Type of change\n")
-    (insert "Please delete options that are not relevant.\n")
-    (insert "- [ ] Bug fix (non-breaking change which fixes an issue)\n")
-    (insert "- [ ] New feature (non-breaking change which adds functionality)\n")
-    (insert "- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)\n")
-    (insert "- [ ] This change requires a documentation update\n\n")
-    (insert "## How Has This Been Tested?\n")
-    (insert "Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration.\n\n")
-    (insert "- [ ] Test A\n")
-    (insert "- [ ] Test B\n\n")
-    (insert "## Checklist:\n")
-    (insert "- [ ] My code follows the style guidelines of this project\n")
-    (insert "- [ ] I have performed a self-review of my own code\n")
-    (insert "- [ ] I have commented my code, particularly in hard-to-understand areas\n")
-    (insert "- [ ] I have made corresponding changes to the documentation\n")
-    (insert "- [ ] My changes generate no new warnings\n")
-    (insert "- [ ] I have added tests that prove my fix is effective or that my feature works\n")
-    (insert "- [ ] New and existing unit tests pass locally with my changes\n")
-    (insert "- [ ] Any dependent changes have been merged and published in downstream modules\n")
+    (insert "# Pull Request Template\n\n"
+        "## Description\n"
+        "Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.\n\n"
+        "Fixes # (issue)\n\n"
+        "## Type of change\n"
+        "Please delete options that are not relevant.\n"
+        "- [ ] Bug fix (non-breaking change which fixes an issue)\n"
+        "- [ ] New feature (non-breaking change which adds functionality)\n"
+        "- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)\n"
+        "- [ ] This change requires a documentation update\n\n"
+        "## How Has This Been Tested?\n"
+        "Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration.\n\n"
+        "- [ ] Test A\n"
+        "- [ ] Test B\n\n"
+        "## Checklist:\n"
+        "- [ ] My code follows the style guidelines of this project\n"
+        "- [ ] I have performed a self-review of my own code\n"
+        "- [ ] I have commented my code, particularly in hard-to-understand areas\n"
+        "- [ ] I have made corresponding changes to the documentation\n"
+        "- [ ] My changes generate no new warnings\n"
+        "- [ ] I have added tests that prove my fix is effective or that my feature works\n"
+        "- [ ] New and existing unit tests pass locally with my changes\n"
+        "- [ ] Any dependent changes have been merged and published in downstream modules\n")
     (markdown-mode)))
+
 
 ;; execute
 (insert-github-pr-template)
@@ -15441,15 +15430,16 @@ Understood! The following block of code defines a function that inserts a Python
 (defun insert-python-function-template ()
   "Insert a Python function template at the current cursor position."
   (interactive)
-  (insert "def function_name(params):\n")
-  (insert "    \"\"\"Function description.\n\n")
-  (insert "    Args:\n")
-  (insert "        params (type): Description.\n\n")
-  (insert "    Returns:\n")
-  (insert "        type: Description.\n")
-  (insert "    \"\"\"\n")
-  (insert "    # TODO: Implement function\n")
-  (insert "    pass\n"))
+  (insert "def function_name(params):\n"
+    "    \"\"\"Function description.\n\n"
+    "    Args:\n"
+    "        params (type): Description.\n\n"
+    "    Returns:\n"
+    "        type: Description.\n"
+    "    \"\"\"\n"
+    "    # TODO: Implement function\n"
+    "    pass\n"))
+
 ;; to execute M-x insert-python-function-template
 #+end_src
 
@@ -15560,17 +15550,17 @@ For quick access, this function is also bound to the key `C-c t`.
   (let* ((buffer-name "*TODO List*"))
     (switch-to-buffer (get-buffer-create buffer-name))
     (erase-buffer)
-    (insert "#+TITLE: TODO List\n\n")
-    (insert "* Summary\n\n")
-    (insert "* High Priority\n")
-    (insert "** TODO [#A] Task 1\n")
-    (insert "** TODO [#A] Task 2\n\n")
-    (insert "* Medium Priority\n")
-    (insert "** TODO [#B] Task 1\n")
-    (insert "** TODO [#B] Task 2\n\n")
-    (insert "* Low Priority\n")
-    (insert "** TODO [#C] Task 1\n")
-    (insert "** TODO [#C] Task 2\n\n")
+    (insert "#+TITLE: TODO List\n\n"
+        "* Summary\n\n"
+        "* High Priority\n"
+        "** TODO [#A] Task 1\n"
+        "** TODO [#A] Task 2\n\n"
+        "* Medium Priority\n"
+        "** TODO [#B] Task 1\n"
+        "** TODO [#B] Task 2\n\n"
+        "* Low Priority\n"
+        "** TODO [#C] Task 1\n"
+        "** TODO [#C] Task 2\n\n")
     (org-mode)
     (goto-char (point-min))))
 
@@ -15629,9 +15619,9 @@ on various tasks.
              (start-time time-tracking-start-time)
              (duration (float-time (time-subtract end-time start-time))))
         (with-temp-buffer
-          (insert (format "Task started at: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S" start-time)))
-          (insert (format "Task ended at: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S" end-time)))
-          (insert (format "Duration: %.2f seconds\n\n" duration))
+          (insert (format "Task started at: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S" start-time))
+                (format "Task ended at: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S" end-time))
+                (format "Duration: %.2f seconds\n\n" duration))
           (append-to-file (point-min) (point-max) time-tracking-log-file))
         (setq time-tracking-start-time nil)
         (message "Time tracking stopped. Duration: %.2f seconds" duration))
@@ -15668,15 +15658,15 @@ well-documented.
         (description (read-string "Description: "))
         (usage (read-string "Usage: ")))
     (goto-char (point-min))
-    (insert (format "#!/bin/bash\n"))
-    (insert (format "# %s\n" (make-string 70 ?#)))
-    (insert (format "# Script Name: %s\n" script-name))
-    (insert (format "# Author: %s\n" author))
-    (insert (format "# Date: %s\n" date))
-    (insert (format "# Description: %s\n" description))
-    (insert (format "# Usage: %s\n" usage))
-    (insert (format "# %s\n" (make-string 70 ?#)))
-    (insert "\n")))
+    (insert (format "#!/bin/bash\n")
+        (format "# %s\n" (make-string 70 ?#))
+        (format "# Script Name: %s\n" script-name)
+        (format "# Author: %s\n" author)
+        (format "# Date: %s\n" date)
+        (format "# Description: %s\n" description)
+        (format "# Usage: %s\n" usage)
+        (format "# %s\n" (make-string 70 ?#))
+        "\n")))
 
 (global-set-key (kbd "C-c h") 'insert-script-header)
 #+end_src
@@ -16666,11 +16656,11 @@ ISBNs by replacing `"978-1590301340"` with the desired ISBN code.
                        (publish-date (alist-get 'publish_date book-data))
                        (number-of-pages (alist-get 'number_of_pages book-data))
                        (cover-url (alist-get 'cover book-data)))
-                   (insert (format "* Title: %s\n" title))
-                   (insert (format "* Authors: %s\n" (string-join authors ", ")))
-                   (insert (format "* Publishers: %s\n" (string-join publishers ", ")))
-                   (insert (format "* Publish Date: %s\n" publish-date))
-                   (insert (format "* Number of Pages: %d\n" number-of-pages))
+                   (insert (format "* Title: %s\n" title)
+                        (format "* Authors: %s\n" (string-join authors ", "))
+                        (format "* Publishers: %s\n" (string-join publishers ", "))
+                        (format "* Publish Date: %s\n" publish-date)
+                        (format "* Number of Pages: %d\n" number-of-pages))
                    (when cover-url
                      (insert (format "* Cover URL: %s\n" (alist-get 'large cover-url))))))
                  (org-mode)
@@ -16713,9 +16703,9 @@ You can use `M-x fetch-random-jokes` to get a new random joke anytime.
            (let* ((json-data (json-read)))
              (with-current-buffer output-buffer
                (erase-buffer)
-               (insert (format "#+TITLE: Random Joke\n\n"))
-               (insert (format "* Setup: %s\n" (alist-get 'setup json-data)))
-               (insert (format "* Punchline: %s\n" (alist-get 'punchline json-data)))
+               (insert (format "#+TITLE: Random Joke\n\n")
+                    (format "* Setup: %s\n" (alist-get 'setup json-data))
+                    (format "* Punchline: %s\n" (alist-get 'punchline json-data)))
                (org-mode)
                (goto-char (point-min))
                (display-buffer output-buffer)))))))))
@@ -16827,8 +16817,8 @@ view the trivia questions.
                  (let* ((question-text (alist-get 'question question))
                        (correct-answer (alist-get 'correct_answer question))
                        (incorrect-answers (alist-get 'incorrect_answers question)))
-                   (insert (format "* Question: %s\n" question-text))
-                   (insert (format "  - Correct Answer: %s\n" correct-answer))
+                   (insert (format "* Question: %s\n" question-text)
+                        (format "  - Correct Answer: %s\n" correct-answer))
                    (dolist (answer incorrect-answers)
                      (insert (format "  - Incorrect Answer: %s\n" answer)))
                    (insert "\n")))
@@ -16881,15 +16871,15 @@ the repository details when prompted.
            (let* ((json-data (json-read)))
              (with-current-buffer output-buffer
                (erase-buffer)
-               (insert (format "#+TITLE: GitHub Repository Information: %s/%s\n\n" owner repo))
-               (insert (format "* Name: %s\n" (alist-get 'name json-data)))
-               (insert (format "* Description: %s\n" (alist-get 'description json-data)))
-               (insert (format "* Owner: %s\n" (alist-get 'login (alist-get 'owner json-data))))
-               (insert (format "* Stars: %d\n" (alist-get 'stargazers_count json-data)))
-               (insert (format "* Forks: %d\n" (alist-get 'forks_count json-data)))
-               (insert (format "* Open Issues: %d\n" (alist-get 'open_issues_count json-data)))
-               (insert (format "* Language: %s\n" (alist-get 'language json-data)))
-               (insert (format "* URL: %s\n" (alist-get 'html_url json-data)))
+               (insert (format "#+TITLE: GitHub Repository Information: %s/%s\n\n" owner repo)
+                    (format "* Name: %s\n" (alist-get 'name json-data))
+                    (format "* Description: %s\n" (alist-get 'description json-data))
+                    (format "* Owner: %s\n" (alist-get 'login (alist-get 'owner json-data)))
+                    (format "* Stars: %d\n" (alist-get 'stargazers_count json-data))
+                    (format "* Forks: %d\n" (alist-get 'forks_count json-data))
+                    (format "* Open Issues: %d\n" (alist-get 'open_issues_count json-data))
+                    (format "* Language: %s\n" (alist-get 'language json-data))
+                    (format "* URL: %s\n" (alist-get 'html_url json-data)))
                (org-mode)
                (goto-char (point-min))
                (display-buffer output-buffer)))))))))
@@ -17431,10 +17421,10 @@ The provided code block defines a function that analyzes all the Emacs Lisp file
             (setq lines (1+ lines)))
           (forward-line 1))))
     (with-temp-file (expand-file-name "code-metrics.txt" directory)
-      (insert (format "Code Metrics Report for %s\n" directory))
-      (insert (format "Total Functions: %d\n" functions))
-      (insert (format "Total Variables: %d\n" variables))
-      (insert (format "Total Lines of Code: %d\n" lines)))
+      (insert (format "Code Metrics Report for %s\n" directory)
+            (format "Total Functions: %d\n" functions)
+            (format "Total Variables: %d\n" variables)
+            (format "Total Lines of Code: %d\n" lines)))
     (message "Code metrics report generated in code-metrics.txt")))
 
 ;; Usage example
@@ -18370,8 +18360,7 @@ centralized buffer in Emacs.
       (progn
         (switch-to-buffer "*To-Do List*")
         (erase-buffer)
-        (insert (format "%-5s %s\n" "Done" "Item"))
-        (insert (make-string 50 ?-) "\n")
+        (insert (format "%-5s %s\n" "Done" "Item") (make-string 50 ?-) "\n")
         (dolist (item todo-list)
           (insert (format "%-5s %s\n"
                           (if (cdr item) "[x]" "[ ]")
@@ -19680,8 +19669,7 @@ This function calculates and summarizes the word count of all Org files in a spe
           (setq total-word-count (+ total-word-count word-count))
           (push (cons (file-name-nondirectory text-file) word-count) file-word-counts))))
     (with-temp-file output-file
-      (insert (format "Total word count: %d\n\n" total-word-count))
-      (insert "Word count per file:\n")
+      (insert (format "Total word count: %d\n\n" total-word-count) "Word count per file:\n")
       (dolist (file-word-count (reverse file-word-counts))
         (insert (format "%s: %d\n" (car file-word-count) (cdr file-word-count)))))
     (message "Word count summary saved to %s" output-file)))
@@ -19951,12 +19939,12 @@ categorized by status.
            ((string= status "WAITING") (setq waiting-count (1+ waiting-count)))
            (t (setq other-count (1+ other-count))))))
       (with-temp-file report-file
-        (insert (format "Org Task Report for %s\n\n" org-file))
-        (insert (format "TODO tasks: %d\n" todo-count))
-        (insert (format "DONE tasks: %d\n" done-count))
-        (insert (format "IN-PROGRESS tasks: %d\n" in-progress-count))
-        (insert (format "WAITING tasks: %d\n" waiting-count))
-        (insert (format "Other tasks: %d\n" other-count))))))
+        (insert (format "Org Task Report for %s\n\n" org-file)
+                (format "TODO tasks: %d\n" todo-count)
+                (format "DONE tasks: %d\n" done-count)
+                (format "IN-PROGRESS tasks: %d\n" in-progress-count)
+                (format "WAITING tasks: %d\n" waiting-count)
+                (format "Other tasks: %d\n" other-count))))))
 
 (defun view-org-task-report (org-file)
   "Generate and view the task report for ORG-FILE."
@@ -30020,9 +30008,7 @@ Here's a function that prompts the user to select multiple buffers and merges th
       (erase-buffer)
       (dolist (buffer-name buffer-names)
         (let* ((content (with-current-buffer buffer-name (buffer-string))))
-          (insert (format "Contents of %s:\n\n" buffer-name))
-          (insert content)
-          (insert "\n\n---\n\n"))))
+          (insert (format "Contents of %s:\n\n" buffer-name) content "\n\n---\n\n"))))
     (switch-to-buffer output-buffer)))
 
 ;; Usage example
@@ -31087,10 +31073,10 @@ This function enhances task management within Org-mode by providing a visual and
        nil 'file)
       (with-current-buffer kanban-buffer
         (erase-buffer)
-        (insert "* Kanban Board\n\n")
-        (insert "** TODO\n" todo-tasks "\n")
-        (insert "** IN PROGRESS\n" in-progress-tasks "\n")
-        (insert "** DONE\n" done-tasks "\n")
+        (insert "* Kanban Board\n\n"
+                "** TODO\n" todo-tasks "\n"
+                "** IN PROGRESS\n" in-progress-tasks "\n"
+                "** DONE\n" done-tasks "\n")
         (org-mode))
       (display-buffer kanban-buffer))
     (message "Kanban board generated.")))
@@ -31422,10 +31408,10 @@ This function provides a quick overview of the Emacs Lisp buffer, helping users 
       (let* ((summary-buffer (get-buffer-create "*Elisp Summary*")))
         (with-current-buffer summary-buffer
           (erase-buffer)
-          (insert (format "Summary of '%s':\n" (buffer-name)))
-          (insert (format "Function definitions: %d\n" func-count))
-          (insert (format "Variable definitions/set: %d\n" var-count))
-          (insert (format "Other top-level forms: %d\n" other-forms-count))
+          (insert (format "Summary of '%s':\n" (buffer-name))
+                (format "Function definitions: %d\n" func-count)
+                (format "Variable definitions/set: %d\n" var-count)
+                (format "Other top-level forms: %d\n" other-forms-count))
           (switch-to-buffer summary-buffer))))))
 
 ;; Assign a keyboard shortcut for easy access to the summary function.
@@ -33714,8 +33700,7 @@ The error `buffer-read-only` error that occurs when attempting to modify `*Messa
   (with-current-buffer (get-buffer-create "*Messages*")
     (let ((inhibit-read-only t))
       (goto-char (point-max))
-      (insert msg)
-      (insert "\n"))))
+      (insert msg "\n"))))
 
 (log-message "this is my log")
 #+end_src
@@ -35997,15 +35982,13 @@ I get this error: (void-variable width). Please fix.
   (let* ((width 10)
         (height 5)))
     ;; Insert the top border of the rectangle
-    (insert (make-string width ?*))
-    (insert "\n")
+    (insert (make-string width ?*)"\n")
     ;; Insert the sides of the rectangle
     (dotimes (_ (1- height))
       (insert "*" (make-string (- width 2) ? ) "*\n"))
     ;; Insert the bottom border of the rectangle if height is more than 1
     (when (> height 1)
-      (insert (make-string width ?*))
-      (insert "\n"))))
+      (insert (make-string width ?*) "\n"))))
 #+end_src
 
 ** input
@@ -36020,15 +36003,13 @@ The parenthesis in your code are not properly balanced so the `width` variable i
   (let* ((width 10)
         (height 5))
     ;; Insert the top border of the rectangle
-    (insert (make-string width ?*))
-    (insert "\n")
+    (insert (make-string width ?*) "\n")
     ;; Insert the sides of the rectangle
     (dotimes (_ (1- height))
       (insert "*" (make-string (- width 2) ? ) "*\n"))
     ;; Insert the bottom border of the rectangle if height is more than 1
     (when (> height 1)
-      (insert (make-string width ?*))
-      (insert "\n"))))
+      (insert (make-string width ?*) "\n"))))
 #+end_src
 
 * Error 129: Indent the whole buffer
@@ -38092,37 +38073,38 @@ I have the following error: void-variable url. Please advise on how to fix it.
 (require 'url)
 (require 'url-http)
 
-(defun fetch-latest-spacex-launch ()
-  "Fetch the latest SpaceX launch data and display it in an Org buffer."
-  (interactive)
-  (let* ((url "https://api.spacexdata.com/v4/launches/latest")))
-    (lexical-let ((output-buffer (get-buffer-create "*Latest SpaceX Launch*")))
-      (url-retrieve
-       url
-       (lambda (status)
-         (let* ((json-object-type 'alist)
-               (json-array-type 'list)
-               (json-key-type 'symbol))
-           (goto-char (point-min))
-           (re-search-forward "\n\n")
-           (let* ((json-data (json-read)))
-             ;; (message "JSON Data: %s" json-data)  ;; Debugging message
-             (let* ((name (alist-get 'name json-data))
-                   (date (alist-get 'date_utc json-data))
-                   (details (alist-get 'details json-data))
-                   (rocket-id (alist-get 'rocket json-data))
-                   (launchpad-id (alist-get 'launchpad json-data)))
-               (with-current-buffer output-buffer
-                 (erase-buffer)
-                 (insert (format "#+TITLE: Latest SpaceX Launch\n\n"))
-                 (insert (format "* Launch Name: %s\n" name))
-                 (insert (format "* Launch Date (UTC): %s\n" date))
-                 (insert (format "* Details: %s\n" details))
-                 (insert (format "* Rocket ID: %s\n" rocket-id))
-                 (insert (format "* Launchpad ID: %s\n" launchpad-id))
-                 (org-mode)
-                 (goto-char (point-min))
-                 (display-buffer output-buffer))))))))))
+    (defun fetch-latest-spacex-launch ()
+        "Fetch the latest SpaceX launch data and display it in an Org buffer."
+        (interactive)
+        (let* ((url "https://api.spacexdata.com/v4/launches/latest")
+                    (output-buffer (get-buffer-create "*Latest SpaceX Launch*"))))
+            (url-retrieve
+            url
+            (lambda (status)
+                (let* ((json-object-type 'alist)
+                    (json-array-type 'list)
+                    (json-key-type 'symbol))
+                (goto-char (point-min))
+                (re-search-forward "\n\n")
+                (let* ((json-data (json-read)))
+                    ;; (message "JSON Data: %s" json-data)  ;; Debugging message
+                    (let* ((name (alist-get 'name json-data))
+                        (date (alist-get 'date_utc json-data))
+                        (details (alist-get 'details json-data))
+                        (rocket-id (alist-get 'rocket json-data))
+                        (launchpad-id (alist-get 'launchpad json-data)))
+                    (with-current-buffer output-buffer
+                        (erase-buffer)
+                        (insert
+                            (format "#+TITLE: Latest SpaceX Launch\n\n")
+                            (format "* Launch Name: %s\n" name)
+                            (format "* Launch Date (UTC): %s\n" date)
+                            (format "* Details: %s\n" details)
+                            (format "* Rocket ID: %s\n" rocket-id)
+                            (format "* Launchpad ID: %s\n" launchpad-id))
+                        (org-mode)
+                        (goto-char (point-min))
+                        (display-buffer output-buffer))))))))
 
 ;; execute
 (fetch-latest-spacex-launch)
@@ -38138,37 +38120,38 @@ The error `void-variable url` happens because you define it inside the `let*` bl
 (require 'url)
 (require 'url-http)
 
-(defun fetch-latest-spacex-launch ()
-  "Fetch the latest SpaceX launch data and display it in an Org buffer."
-  (interactive)
-  (let* ((url "https://api.spacexdata.com/v4/launches/latest"))
-    (lexical-let ((output-buffer (get-buffer-create "*Latest SpaceX Launch*")))
-      (url-retrieve
-       url
-       (lambda (status)
-         (let* ((json-object-type 'alist)
-               (json-array-type 'list)
-               (json-key-type 'symbol))
-           (goto-char (point-min))
-           (re-search-forward "\n\n")
-           (let* ((json-data (json-read)))
-             ;; (message "JSON Data: %s" json-data)  ;; Debugging message
-             (let* ((name (alist-get 'name json-data))
-                   (date (alist-get 'date_utc json-data))
-                   (details (alist-get 'details json-data))
-                   (rocket-id (alist-get 'rocket json-data))
-                   (launchpad-id (alist-get 'launchpad json-data)))
-               (with-current-buffer output-buffer
-                 (erase-buffer)
-                 (insert (format "#+TITLE: Latest SpaceX Launch\n\n"))
-                 (insert (format "* Launch Name: %s\n" name))
-                 (insert (format "* Launch Date (UTC): %s\n" date))
-                 (insert (format "* Details: %s\n" details))
-                 (insert (format "* Rocket ID: %s\n" rocket-id))
-                 (insert (format "* Launchpad ID: %s\n" launchpad-id))
-                 (org-mode)
-                 (goto-char (point-min))
-                 (display-buffer output-buffer))))))))))
+    (defun fetch-latest-spacex-launch ()
+        "Fetch the latest SpaceX launch data and display it in an Org buffer."
+        (interactive)
+        (let* ((url "https://api.spacexdata.com/v4/launches/latest")
+                    (output-buffer (get-buffer-create "*Latest SpaceX Launch*")))
+            (url-retrieve
+            url
+            (lambda (status)
+                (let* ((json-object-type 'alist)
+                    (json-array-type 'list)
+                    (json-key-type 'symbol))
+                (goto-char (point-min))
+                (re-search-forward "\n\n")
+                (let* ((json-data (json-read)))
+                    ;; (message "JSON Data: %s" json-data)  ;; Debugging message
+                    (let* ((name (alist-get 'name json-data))
+                        (date (alist-get 'date_utc json-data))
+                        (details (alist-get 'details json-data))
+                        (rocket-id (alist-get 'rocket json-data))
+                        (launchpad-id (alist-get 'launchpad json-data)))
+                    (with-current-buffer output-buffer
+                        (erase-buffer)
+                        (insert
+                            (format "#+TITLE: Latest SpaceX Launch\n\n")
+                            (format "* Launch Name: %s\n" name)
+                            (format "* Launch Date (UTC): %s\n" date)
+                            (format "* Details: %s\n" details)
+                            (format "* Rocket ID: %s\n" rocket-id)
+                            (format "* Launchpad ID: %s\n" launchpad-id))
+                        (org-mode)
+                        (goto-char (point-min))
+                        (display-buffer output-buffer)))))))))
 
 ;; execute
 (fetch-latest-spacex-launch)
@@ -38388,35 +38371,35 @@ When I call the `fetch-github-commits` interactively I get the following error: 
 (require 'url-http)
 
 (defun fetch-github-commits (owner repo)
-  "Fetch recent commits from the specified GitHub repository OWNER/REPO and display them in an Org buffer."
-  (interactive "uEnter GitHub Owner: \nsEnter GitHub Repo: ")
-  (let* ((url (format "https://api.github.com/repos/%s/%s/commits" owner repo)))
-    (lexical-let ((owner owner)
-                  (repo repo)
-                  (output-buffer (get-buffer-create (format "*GitHub Commits for %s/%s*" owner repo))))
-      (url-retrieve
-       url
-       (lambda (status)
-         (let* ((json-object-type 'alist)
-               (json-array-type 'list)
-               (json-key-type 'symbol))
-           (goto-char (point-min))
-           (re-search-forward "\n\n")
-           (let* ((json-data (json-read)))
-             (with-current-buffer output-buffer
-               (erase-buffer)
-               (insert (format "#+TITLE: Recent Commits for %s/%s\n\n" owner repo))
-               (dolist (commit json-data)
-                 (let* ((commit-data (alist-get 'commit commit))
-                        (message (alist-get 'message commit-data))
-                        (author (alist-get 'name (alist-get 'author commit-data)))
-                        (date (alist-get 'date (alist-get 'author commit-data))))
-                   (insert (format "* Commit: %s\n" message))
-                   (insert (format "  Author: %s\n" author))
-                   (insert (format "  Date: %s\n\n" date))))
-               (org-mode)
-               (goto-char (point-min))
-               (display-buffer output-buffer)))))))))
+        "Fetch recent commits from the specified GitHub repository OWNER/REPO and display them in an Org buffer."
+        (interactive "uEnter GitHub Owner: \nsEnter GitHub Repo: ")
+        (let* ((url (format "https://api.github.com/repos/%s/%s/commits" owner repo))
+                (output-buffer (get-buffer-create (format "*GitHub Commits for %s/%s*" owner repo))))
+            (url-retrieve
+            url
+            (lambda (status)
+                (let* ((json-object-type 'alist)
+                    (json-array-type 'list)
+                    (json-key-type 'symbol))
+                (goto-char (point-min))
+                (re-search-forward "\n\n")
+                (let* ((json-data (json-read)))
+                    (with-current-buffer output-buffer
+                    (erase-buffer)
+                    (insert (format "#+TITLE: Recent Commits for %s/%s\n\n" owner repo))
+                    (dolist (commit json-data)
+                        (let* ((commit-data (alist-get 'commit commit))
+                                (message (alist-get 'message commit-data))
+                                (author (alist-get 'name (alist-get 'author commit-data)))
+                                (date (alist-get 'date (alist-get 'author commit-data))))
+                        (insert (format "* Commit: %s\n" message)
+                                    (format "  Author: %s\n" author)
+                                    (format "  Date: %s\n\n" date))))
+                    (org-mode)
+                    (goto-char (point-min))
+                    (display-buffer output-buffer))))))))
+
+
 
 ;; execute
 (fetch-github-commits "emacs-mirror" "emacs")
@@ -38433,35 +38416,34 @@ The error "Invalid control letter ‘u’" indicates that you are using the wron
 (require 'url-http)
 
 (defun fetch-github-commits (owner repo)
-  "Fetch recent commits from the specified GitHub repository OWNER/REPO and display them in an Org buffer."
-  (interactive "sEnter GitHub Owner: \nsEnter GitHub Repo: ")
-  (let* ((url (format "https://api.github.com/repos/%s/%s/commits" owner repo)))
-    (lexical-let ((owner owner)
-                  (repo repo)
-                  (output-buffer (get-buffer-create (format "*GitHub Commits for %s/%s*" owner repo))))
-      (url-retrieve
-       url
-       (lambda (status)
-         (let* ((json-object-type 'alist)
-               (json-array-type 'list)
-               (json-key-type 'symbol))
-           (goto-char (point-min))
-           (re-search-forward "\n\n")
-           (let* ((json-data (json-read)))
-             (with-current-buffer output-buffer
-               (erase-buffer)
-               (insert (format "#+TITLE: Recent Commits for %s/%s\n\n" owner repo))
-               (dolist (commit json-data)
-                 (let* ((commit-data (alist-get 'commit commit))
-                        (message (alist-get 'message commit-data))
-                        (author (alist-get 'name (alist-get 'author commit-data)))
-                        (date (alist-get 'date (alist-get 'author commit-data))))
-                   (insert (format "* Commit: %s\n" message))
-                   (insert (format "  Author: %s\n" author))
-                   (insert (format "  Date: %s\n\n" date))))
-               (org-mode)
-               (goto-char (point-min))
-               (display-buffer output-buffer)))))))))
+        "Fetch recent commits from the specified GitHub repository OWNER/REPO and display them in an Org buffer."
+        (interactive "sEnter GitHub Owner: \nsEnter GitHub Repo: ")
+        (let* ((url (format "https://api.github.com/repos/%s/%s/commits" owner repo))
+                (output-buffer (get-buffer-create (format "*GitHub Commits for %s/%s*" owner repo))))
+            (url-retrieve
+            url
+            (lambda (status)
+                (let* ((json-object-type 'alist)
+                    (json-array-type 'list)
+                    (json-key-type 'symbol))
+                (goto-char (point-min))
+                (re-search-forward "\n\n")
+                (let* ((json-data (json-read)))
+                    (with-current-buffer output-buffer
+                    (erase-buffer)
+                    (insert (format "#+TITLE: Recent Commits for %s/%s\n\n" owner repo))
+                    (dolist (commit json-data)
+                        (let* ((commit-data (alist-get 'commit commit))
+                                (message (alist-get 'message commit-data))
+                                (author (alist-get 'name (alist-get 'author commit-data)))
+                                (date (alist-get 'date (alist-get 'author commit-data))))
+                        (insert (format "* Commit: %s\n" message)
+                                    (format "  Author: %s\n" author)
+                                    (format "  Date: %s\n\n" date))))
+                    (org-mode)
+                    (goto-char (point-min))
+                    (display-buffer output-buffer))))))))
+
 
 ;; execute
 (fetch-github-commits "emacs-mirror" "emacs")
@@ -38706,9 +38688,9 @@ Why do I get the message "Symbol’s function definition is void: delete-buffer"
                      (author (alist-get 'by story))
                      (score (alist-get 'score story))
                      (url (alist-get 'url story)))
-                 (insert (format "* %s\n" title))
-                 (insert (format "  Author: %s\n" author))
-                 (insert (format "  Score: %d\n" score))
+                 (insert (format "* %s\n" title)
+                        (format "  Author: %s\n" author)
+                        (format "  Score: %d\n" score))
                  (when url
                    (insert (format "  URL: %s\n" url)))
                  (insert "\n")))
@@ -38769,9 +38751,9 @@ This happens because the `delete-buffer` function does not exist. In order to de
                      (author (alist-get 'by story))
                      (score (alist-get 'score story))
                      (url (alist-get 'url story)))
-                 (insert (format "* %s\n" title))
-                 (insert (format "  Author: %s\n" author))
-                 (insert (format "  Score: %d\n" score))
+                 (insert (format "* %s\n" title)
+                        (format "  Author: %s\n" author)
+                        (format "  Score: %d\n" score))
                  (when url
                    (insert (format "  URL: %s\n" url)))
                  (insert "\n")))
@@ -39386,8 +39368,7 @@ The code causes the following runtime error: (void-function run-process). Please
                             (lambda (proc output)
                               (with-current-buffer log-buffer
                                 (goto-char (point-max))
-                                (insert output)
-                                (insert "\n"))))))))
+                                (insert output "\n"))))))))
 
 ;; Usage example
 (monitor-directory-changes "~/my-project" "*Directory-Changes-Log*")
@@ -39414,8 +39395,7 @@ The error: `void-function run-process` indicates that the function `run-process`
                             (lambda (proc output)
                               (with-current-buffer log-buffer
                                 (goto-char (point-max))
-                                (insert output)
-                                (insert "\n"))))))))
+                                (insert output "\n"))))))))
 
 ;; Usage example
 (monitor-directory-changes "~/my-project" "*Directory-Changes-Log*")
@@ -39822,13 +39802,13 @@ Why do I get this error: (void-variable covid-data)? Provide a fix please.
                      (today-cases (alist-get 'todayCases covid-data))
                      (today-deaths (alist-get 'todayDeaths covid-data))
                      (today-recovered (alist-get 'todayRecovered covid-data)))
-                 (insert (format "* Total Cases: %d\n" cases))
-                 (insert (format "* Total Deaths: %d\n" deaths))
-                 (insert (format "* Total Recovered: %d\n" recovered))
-                 (insert (format "* Active Cases: %d\n" active))
-                 (insert (format "* Cases Today: %d\n" today-cases))
-                 (insert (format "* Deaths Today: %d\n" today-deaths))
-                 (insert (format "* Recovered Today: %d\n" today-recovered)))
+                 (insert (format "* Total Cases: %d\n" cases)
+                        (format "* Total Deaths: %d\n" deaths)
+                        (format "* Total Recovered: %d\n" recovered)
+                        (format "* Active Cases: %d\n" active)
+                        (format "* Cases Today: %d\n" today-cases)
+                        (format "* Deaths Today: %d\n" today-deaths)
+                        (format "* Recovered Today: %d\n" today-recovered)))
                (org-mode)
                (goto-char (point-min))
                (display-buffer output-buffer)))))))))
@@ -39872,13 +39852,13 @@ The error `void-variable covid-data` indicates that you are referencing the vari
                      (today-cases (alist-get 'todayCases covid-data))
                      (today-deaths (alist-get 'todayDeaths covid-data))
                      (today-recovered (alist-get 'todayRecovered covid-data)))
-                 (insert (format "* Total Cases: %d\n" cases))
-                 (insert (format "* Total Deaths: %d\n" deaths))
-                 (insert (format "* Total Recovered: %d\n" recovered))
-                 (insert (format "* Active Cases: %d\n" active))
-                 (insert (format "* Cases Today: %d\n" today-cases))
-                 (insert (format "* Deaths Today: %d\n" today-deaths))
-                 (insert (format "* Recovered Today: %d\n" today-recovered)))
+                 (insert (format "* Total Cases: %d\n" cases)
+                        (format "* Total Deaths: %d\n" deaths)
+                        (format "* Total Recovered: %d\n" recovered)
+                        (format "* Active Cases: %d\n" active)
+                        (format "* Cases Today: %d\n" today-cases)
+                        (format "* Deaths Today: %d\n" today-deaths)
+                        (format "* Recovered Today: %d\n" today-recovered)))
                (org-mode)
                (goto-char (point-min))
                (display-buffer output-buffer)))))))))
@@ -40167,8 +40147,7 @@ When I run my code I get this error: (void-variable prepend-text-to-file). Provi
                            (insert-file-contents file)
                            (buffer-string))))
     (with-temp-buffer
-      (insert text)
-      (insert file-content)
+      (insert text file-content)
       (write-region (point-min) (point-max) file))
     (message "Prepended text to file: %s" file)))
 
@@ -40197,8 +40176,7 @@ The error: `void-variable prepend-text-to-file` indicates that the variable `pre
                            (insert-file-contents file)
                            (buffer-string))))
     (with-temp-buffer
-      (insert text)
-      (insert file-content)
+      (insert text file-content)
       (write-region (point-min) (point-max) file))
     (message "Prepended text to file: %s" file)))
 
@@ -41811,10 +41789,10 @@ Running the following code triggers the error: (void-variable name). How to fix 
                          (genres (alist-get 'genres movie))
                          (summary (alist-get 'summary movie))
                          (url (alist-get 'url movie))))
-                     (insert (format "* Movie: %s\n" name))
-                     (insert (format "  - Genres: %s\n" (string-join genres ", ")))
-                     (insert (format "  - Summary: %s\n" (replace-regexp-in-string "<[^>]*>" "" summary)))
-                     (insert (format "  - URL: [[%s][%s]]\n\n" url url)))))
+                     (insert (format "* Movie: %s\n" name)
+                            (format "  - Genres: %s\n" (string-join genres ", "))
+                            (format "  - Summary: %s\n" (replace-regexp-in-string "<[^>]*>" "" summary))
+                            (format "  - URL: [[%s][%s]]\n\n" url url)))))
                  (org-mode)
                  (goto-char (point-min))
                  (org-display-inline-images)
@@ -41871,10 +41849,10 @@ The error `void-variable name` indicates that the variable `name` has not been d
                          (genres (alist-get 'genres movie))
                          (summary (alist-get 'summary movie))
                          (url (alist-get 'url movie)))
-                     (insert (format "* Movie: %s\n" name))
-                     (insert (format "  - Genres: %s\n" (string-join genres ", ")))
-                     (insert (format "  - Summary: %s\n" (replace-regexp-in-string "<[^>]*>" "" summary)))
-                     (insert (format "  - URL: [[%s][%s]]\n\n" url url))))
+                     (insert (format "* Movie: %s\n" name)
+                            (format "  - Genres: %s\n" (string-join genres ", "))
+                            (format "  - Summary: %s\n" (replace-regexp-in-string "<[^>]*>" "" summary))
+                            (format "  - URL: [[%s][%s]]\n\n" url url))))
                  (org-mode)
                  (goto-char (point-min))
                  (org-display-inline-images)
@@ -42000,17 +41978,17 @@ Why do I get this error: (void-function select-buffer)? Please fix.
   (interactive)
   (let* ((buffer (generate-new-buffer "untitled.html")))
     (select-buffer buffer)
-    (insert "<!DOCTYPE html>\n")
-    (insert "<html lang=\"en\">\n")
-    (insert "<head>\n")
-    (insert "    <meta charset=\"UTF-8\">\n")
-    (insert "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n")
-    (insert "    <title>Document</title>\n")
-    (insert "</head>\n")
-    (insert "<body>\n")
-    (insert "    \n")
-    (insert "</body>\n")
-    (insert "</html>\n")
+    (insert "<!DOCTYPE html>\n"
+        "<html lang=\"en\">\n"
+        "<head>\n"
+        "    <meta charset=\"UTF-8\">\n"
+        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
+        "    <title>Document</title>\n"
+        "</head>\n"
+        "<body>\n"
+        "    \n"
+        "</body>\n"
+        "</html>\n")
     (html-mode)))
 
 ;; execute
@@ -42028,17 +42006,17 @@ The error `void-function select-buffer` states that the `select-buffer` does not
   (interactive)
   (let* ((buffer (generate-new-buffer "untitled.html")))
     (switch-to-buffer buffer)
-    (insert "<!DOCTYPE html>\n")
-    (insert "<html lang=\"en\">\n")
-    (insert "<head>\n")
-    (insert "    <meta charset=\"UTF-8\">\n")
-    (insert "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n")
-    (insert "    <title>Document</title>\n")
-    (insert "</head>\n")
-    (insert "<body>\n")
-    (insert "    \n")
-    (insert "</body>\n")
-    (insert "</html>\n")
+    (insert "<!DOCTYPE html>\n"
+        "<html lang=\"en\">\n"
+        "<head>\n"
+        "    <meta charset=\"UTF-8\">\n"
+        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
+        "    <title>Document</title>\n"
+        "</head>\n"
+        "<body>\n"
+        "    \n"
+        "</body>\n"
+        "</html>\n")
     (html-mode)))
 
 ;; execute
@@ -42056,57 +42034,57 @@ Your code generates this error: `org-babel-execute:elisp: End of file during par
   (interactive)
   (let* ((buffer (generate-new-buffer "README.md")))
     (switch-to-buffer buffer)
-    (insert "# Project Title\n\n")
-    (insert "One Paragraph of project description goes here.\n\n")
-    (insert "## Getting Started\n\n")
-    (insert "These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.\n\n")
-    (insert "### Prerequisites\n\n")
-    (insert "What things you need to install the software and how to install them.\n\n")
-    (insert "```\n")
-    (insert "Give examples\n")
-    (insert "```\n\n")
-    (insert "### Installing\n\n")
-    (insert "A step by step series of examples that tell you how to get a development environment running.\n\n")
-    (insert "Say what the step will be.\n\n")
-    (insert "```\n")
-    (insert "Give the example\n")
-    (insert "```\n\n")
-    (insert "And repeat.\n\n")
-    (insert "```\n")
-    (insert "until finished\n")
-    (insert "```\n\n")
-    (insert "End with an example of getting some data out of the system or using it for a little demo.\n\n")
-    (insert "## Running the tests\n\n")
-    (insert "Explain how to run the automated tests for this system.\n\n")
-    (insert "### Break down into end to end tests\n\n")
-    (insert "Explain what these tests test and why.\n\n")
-    (insert "```\n")
-    (insert "Give an example\n")
-    (insert "```\n\n")
-    (insert "### And coding style tests\n\n")
-    (insert "Explain what these tests test and why.\n\n")
-    (insert "```\n")
-    (insert "Give an example\n")
-    (insert "```\n\n")
-    (insert "## Deployment\n\n")
-    (insert "Add additional notes about how to deploy this on a live system.\n\n")
-    (insert "## Built With\n\n")
-    (insert "* [Name](https://example.com) - The framework used\n")
-    (insert "* [Name](https://example.com) - Dependency\n")
-    (insert "* [Name](https://example.com) - Another dependency\n\n")
-    (insert "## Contributing\n\n")
-    (insert "Please read [CONTRIBUTING.md](https://example.com) for details on our code of conduct, and the process for submitting pull requests to us.\n\n")
-    (insert "## Versioning\n\n")
-    (insert "We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://example.com/tags).\n\n")
-    (insert "## Authors\n\n")
-    (insert "* **Your Name** - *Initial work* - [YourWebsite](https://example.com)\n\n")
-    (insert "See also the list of [contributors](https://example.com/contributors) who participated in this project.\n\n")
-    (insert "## License\n\n")
-    (insert "This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.\n\n")
-    (insert "## Acknowledgments\n\n")
-    (insert "* Hat tip to anyone whose code was used\n")
-    (insert "* Inspiration\n")
-    (insert "* etc\n")
+    (insert "# Project Title\n\n"
+        "One Paragraph of project description goes here.\n\n"
+        "## Getting Started\n\n"
+        "These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.\n\n"
+        "### Prerequisites\n\n"
+        "What things you need to install the software and how to install them.\n\n"
+        "```\n"
+        "Give examples\n"
+        "```\n\n"
+        "### Installing\n\n"
+        "A step by step series of examples that tell you how to get a development environment running.\n\n"
+        "Say what the step will be.\n\n"
+        "```\n"
+        "Give the example\n"
+        "```\n\n"
+        "And repeat.\n\n"
+        "```\n"
+        "until finished\n"
+        "```\n\n"
+        "End with an example of getting some data out of the system or using it for a little demo.\n\n"
+        "## Running the tests\n\n"
+        "Explain how to run the automated tests for this system.\n\n"
+        "### Break down into end to end tests\n\n"
+        "Explain what these tests test and why.\n\n"
+        "```\n"
+        "Give an example\n"
+        "```\n\n"
+        "### And coding style tests\n\n"
+        "Explain what these tests test and why.\n\n"
+        "```\n"
+        "Give an example\n"
+        "```\n\n"
+        "## Deployment\n\n"
+        "Add additional notes about how to deploy this on a live system.\n\n"
+        "## Built With\n\n"
+        "* [Name](https://example.com) - The framework used\n"
+        "* [Name](https://example.com) - Dependency\n"
+        "* [Name](https://example.com) - Another dependency\n\n"
+        "## Contributing\n\n"
+        "Please read [CONTRIBUTING.md](https://example.com) for details on our code of conduct, and the process for submitting pull requests to us.\n\n"
+        "## Versioning\n\n"
+        "We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://example.com/tags).\n\n"
+        "## Authors\n\n"
+        "* **Your Name** - *Initial work* - [YourWebsite](https://example.com)\n\n"
+        "See also the list of [contributors](https://example.com/contributors) who participated in this project.\n\n"
+        "## License\n\n"
+        "This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.\n\n"
+        "## Acknowledgments\n\n"
+        "* Hat tip to anyone whose code was used\n"
+        "* Inspiration\n"
+        "* etc\n")
     (markdown-mode))
 
 ;; execute
@@ -42124,57 +42102,57 @@ This error happens because you have unbalanced parenthesis in your code.  The cl
   (interactive)
   (let* ((buffer (generate-new-buffer "README.md")))
     (switch-to-buffer buffer)
-    (insert "# Project Title\n\n")
-    (insert "One Paragraph of project description goes here.\n\n")
-    (insert "## Getting Started\n\n")
-    (insert "These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.\n\n")
-    (insert "### Prerequisites\n\n")
-    (insert "What things you need to install the software and how to install them.\n\n")
-    (insert "```\n")
-    (insert "Give examples\n")
-    (insert "```\n\n")
-    (insert "### Installing\n\n")
-    (insert "A step by step series of examples that tell you how to get a development environment running.\n\n")
-    (insert "Say what the step will be.\n\n")
-    (insert "```\n")
-    (insert "Give the example\n")
-    (insert "```\n\n")
-    (insert "And repeat.\n\n")
-    (insert "```\n")
-    (insert "until finished\n")
-    (insert "```\n\n")
-    (insert "End with an example of getting some data out of the system or using it for a little demo.\n\n")
-    (insert "## Running the tests\n\n")
-    (insert "Explain how to run the automated tests for this system.\n\n")
-    (insert "### Break down into end to end tests\n\n")
-    (insert "Explain what these tests test and why.\n\n")
-    (insert "```\n")
-    (insert "Give an example\n")
-    (insert "```\n\n")
-    (insert "### And coding style tests\n\n")
-    (insert "Explain what these tests test and why.\n\n")
-    (insert "```\n")
-    (insert "Give an example\n")
-    (insert "```\n\n")
-    (insert "## Deployment\n\n")
-    (insert "Add additional notes about how to deploy this on a live system.\n\n")
-    (insert "## Built With\n\n")
-    (insert "* [Name](https://example.com) - The framework used\n")
-    (insert "* [Name](https://example.com) - Dependency\n")
-    (insert "* [Name](https://example.com) - Another dependency\n\n")
-    (insert "## Contributing\n\n")
-    (insert "Please read [CONTRIBUTING.md](https://example.com) for details on our code of conduct, and the process for submitting pull requests to us.\n\n")
-    (insert "## Versioning\n\n")
-    (insert "We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://example.com/tags).\n\n")
-    (insert "## Authors\n\n")
-    (insert "* **Your Name** - *Initial work* - [YourWebsite](https://example.com)\n\n")
-    (insert "See also the list of [contributors](https://example.com/contributors) who participated in this project.\n\n")
-    (insert "## License\n\n")
-    (insert "This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.\n\n")
-    (insert "## Acknowledgments\n\n")
-    (insert "* Hat tip to anyone whose code was used\n")
-    (insert "* Inspiration\n")
-    (insert "* etc\n")
+    (insert "# Project Title\n\n"
+        "One Paragraph of project description goes here.\n\n"
+        "## Getting Started\n\n"
+        "These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.\n\n"
+        "### Prerequisites\n\n"
+        "What things you need to install the software and how to install them.\n\n"
+        "```\n"
+        "Give examples\n"
+        "```\n\n"
+        "### Installing\n\n"
+        "A step by step series of examples that tell you how to get a development environment running.\n\n"
+        "Say what the step will be.\n\n"
+        "```\n"
+        "Give the example\n"
+        "```\n\n"
+        "And repeat.\n\n"
+        "```\n"
+        "until finished\n"
+        "```\n\n"
+        "End with an example of getting some data out of the system or using it for a little demo.\n\n"
+        "## Running the tests\n\n"
+        "Explain how to run the automated tests for this system.\n\n"
+        "### Break down into end to end tests\n\n"
+        "Explain what these tests test and why.\n\n"
+        "```\n"
+        "Give an example\n"
+        "```\n\n"
+        "### And coding style tests\n\n"
+        "Explain what these tests test and why.\n\n"
+        "```\n"
+        "Give an example\n"
+        "```\n\n"
+        "## Deployment\n\n"
+        "Add additional notes about how to deploy this on a live system.\n\n"
+        "## Built With\n\n"
+        "* [Name](https://example.com) - The framework used\n"
+        "* [Name](https://example.com) - Dependency\n"
+        "* [Name](https://example.com) - Another dependency\n\n"
+        "## Contributing\n\n"
+        "Please read [CONTRIBUTING.md](https://example.com) for details on our code of conduct, and the process for submitting pull requests to us.\n\n"
+        "## Versioning\n\n"
+        "We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://example.com/tags).\n\n"
+        "## Authors\n\n"
+        "* **Your Name** - *Initial work* - [YourWebsite](https://example.com)\n\n"
+        "See also the list of [contributors](https://example.com/contributors) who participated in this project.\n\n"
+        "## License\n\n"
+        "This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.\n\n"
+        "## Acknowledgments\n\n"
+        "* Hat tip to anyone whose code was used\n"
+        "* Inspiration\n"
+        "* etc\n")
     (markdown-mode)))
 
 ;; execute
@@ -42324,25 +42302,25 @@ What does the error mean: "`let' bindings can have only one value-form"? How can
   (interactive)
   (let* ((buffer generate-new-buffer "script.py"))
     (switch-to-buffer buffer)
-    (insert "#!/usr/bin/env python3\n\n")
-    (insert "\"\"\"\n")
-    (insert "Description: Brief description of the script\n")
-    (insert "\"\"\"\n\n")
-    (insert "import argparse\n\n")
-    (insert "def parse_args():\n")
-    (insert "    parser = argparse.ArgumentParser(description='Description of your script')\n")
-    (insert "    parser.add_argument('-f', '--file', type=str, help='File to process')\n")
-    (insert "    parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose mode')\n")
-    (insert "    args = parser.parse_args()\n")
-    (insert "    return args\n\n")
-    (insert "def main():\n")
-    (insert "    args = parse_args()\n")
-    (insert "    if args.verbose:\n")
-    (insert "        print('Verbose mode enabled')\n")
-    (insert "    if args.file:\n")
-    (insert "        print(f'Processing file: {args.file}')\n\n")
-    (insert "if __name__ == '__main__':\n")
-    (insert "    main()\n")
+    (insert "#!/usr/bin/env python3\n\n"
+            "\"\"\"\n"
+            "Description: Brief description of the script\n"
+            "\"\"\"\n\n"
+            "import argparse\n\n"
+            "def parse_args():\n"
+            "    parser = argparse.ArgumentParser(description='Description of your script')\n"
+            "    parser.add_argument('-f', '--file', type=str, help='File to process')\n"
+            "    parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose mode')\n"
+            "    args = parser.parse_args()\n"
+            "    return args\n\n"
+            "def main():\n"
+            "    args = parse_args()\n"
+            "    if args.verbose:\n"
+            "        print('Verbose mode enabled')\n"
+            "    if args.file:\n"
+            "        print(f'Processing file: {args.file}')\n\n"
+            "if __name__ == '__main__':\n"
+            "    main()\n")
     (python-mode)))
 
 ;; execute
@@ -42360,25 +42338,25 @@ The variable list of the `let*` code inside appears to be broken.  Specifically,
   (interactive)
   (let* ((buffer (generate-new-buffer "script.py")))
     (switch-to-buffer buffer)
-    (insert "#!/usr/bin/env python3\n\n")
-    (insert "\"\"\"\n")
-    (insert "Description: Brief description of the script\n")
-    (insert "\"\"\"\n\n")
-    (insert "import argparse\n\n")
-    (insert "def parse_args():\n")
-    (insert "    parser = argparse.ArgumentParser(description='Description of your script')\n")
-    (insert "    parser.add_argument('-f', '--file', type=str, help='File to process')\n")
-    (insert "    parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose mode')\n")
-    (insert "    args = parser.parse_args()\n")
-    (insert "    return args\n\n")
-    (insert "def main():\n")
-    (insert "    args = parse_args()\n")
-    (insert "    if args.verbose:\n")
-    (insert "        print('Verbose mode enabled')\n")
-    (insert "    if args.file:\n")
-    (insert "        print(f'Processing file: {args.file}')\n\n")
-    (insert "if __name__ == '__main__':\n")
-    (insert "    main()\n")
+    (insert "#!/usr/bin/env python3\n\n"
+            "\"\"\"\n"
+            "Description: Brief description of the script\n"
+            "\"\"\"\n\n"
+            "import argparse\n\n"
+            "def parse_args():\n"
+            "    parser = argparse.ArgumentParser(description='Description of your script')\n"
+            "    parser.add_argument('-f', '--file', type=str, help='File to process')\n"
+            "    parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose mode')\n"
+            "    args = parser.parse_args()\n"
+            "    return args\n\n"
+            "def main():\n"
+            "    args = parse_args()\n"
+            "    if args.verbose:\n"
+            "        print('Verbose mode enabled')\n"
+            "    if args.file:\n"
+            "        print(f'Processing file: {args.file}')\n\n"
+            "if __name__ == '__main__':\n"
+            "    main()\n")
     (python-mode)))
 
 ;; execute
@@ -42730,35 +42708,36 @@ The code generates the following runtime error: "`let' bindings can have only on
 (defun insert-latex-document-template ()
   "Open a new buffer, insert a LaTeX document template, and activate LaTeX mode."
   (interactive)
-  (let* ((buffer generate-new-buffer "document.tex")))
+  (let* ((buffer (generate-new-buffer "document.tex"))))
     (switch-to-buffer buffer)
-    (insert "\\documentclass{article}\n")
-    (insert "\\usepackage[utf8]{inputenc}\n")
-    (insert "\\usepackage{amsmath}\n")
-    (insert "\\usepackage{graphicx}\n")
-    (insert "\\usepackage{hyperref}\n")
-    (insert "\\usepackage{geometry}\n")
-    (insert "\\geometry{a4paper, margin=1in}\n")
-    (insert "\n\\title{Your Title Here}\n")
-    (insert "\\author{Your Name}\n")
-    (insert "\\date{\\today}\n")
-    (insert "\n\\begin{document}\n")
-    (insert "\n\\maketitle\n")
-    (insert "\n\\begin{abstract}\n")
-    (insert "Your abstract here.\n")
-    (insert "\\end{abstract}\n")
-    (insert "\n\\section{Introduction}\n")
-    (insert "Your introduction here.\n")
-    (insert "\n\\section{Main Content}\n")
-    (insert "Your main content here.\n")
-    (insert "\n\\section{Conclusion}\n")
-    (insert "Your conclusion here.\n")
-    (insert "\n\\begin{thebibliography}{9}\n")
-    (insert "\\bibitem{example}\n")
-    (insert "Author, \\textit{Title}, Journal, Year.\n")
-    (insert "\\end{thebibliography}\n")
-    (insert "\n\\end{document}\n")
-    (latex-mode)))
+    (insert "\\documentclass{article}\n"
+        "\\usepackage[utf8]{inputenc}\n"
+        "\\usepackage{amsmath}\n"
+        "\\usepackage{graphicx}\n"
+        "\\usepackage{hyperref}\n"
+        "\\usepackage{geometry}\n"
+        "\\geometry{a4paper, margin=1in}\n"
+        "\n\\title{Your Title Here}\n"
+        "\\author{Your Name}\n"
+        "\\date{\\today}\n"
+        "\n\\begin{document}\n"
+        "\n\\maketitle\n"
+        "\n\\begin{abstract}\n"
+        "Your abstract here.\n"
+        "\\end{abstract}\n"
+        "\n\\section{Introduction}\n"
+        "Your introduction here.\n"
+        "\n\\section{Main Content}\n"
+        "Your main content here.\n"
+        "\n\\section{Conclusion}\n"
+        "Your conclusion here.\n"
+        "\n\\begin{thebibliography}{9}\n"
+        "\\bibitem{example}\n"
+        "Author, \\textit{Title}, Journal, Year.\n"
+        "\\end{thebibliography}\n"
+        "\n\\end{document}\n")
+    (latex-mode))
+
 
 ;; execute
 (insert-latex-document-template)
@@ -42775,32 +42754,32 @@ This error indicates that you are making multiple bindings of value-forms to the
   (interactive)
   (let* ((buffer (generate-new-buffer "document.tex")))
     (switch-to-buffer buffer)
-    (insert "\\documentclass{article}\n")
-    (insert "\\usepackage[utf8]{inputenc}\n")
-    (insert "\\usepackage{amsmath}\n")
-    (insert "\\usepackage{graphicx}\n")
-    (insert "\\usepackage{hyperref}\n")
-    (insert "\\usepackage{geometry}\n")
-    (insert "\\geometry{a4paper, margin=1in}\n")
-    (insert "\n\\title{Your Title Here}\n")
-    (insert "\\author{Your Name}\n")
-    (insert "\\date{\\today}\n")
-    (insert "\n\\begin{document}\n")
-    (insert "\n\\maketitle\n")
-    (insert "\n\\begin{abstract}\n")
-    (insert "Your abstract here.\n")
-    (insert "\\end{abstract}\n")
-    (insert "\n\\section{Introduction}\n")
-    (insert "Your introduction here.\n")
-    (insert "\n\\section{Main Content}\n")
-    (insert "Your main content here.\n")
-    (insert "\n\\section{Conclusion}\n")
-    (insert "Your conclusion here.\n")
-    (insert "\n\\begin{thebibliography}{9}\n")
-    (insert "\\bibitem{example}\n")
-    (insert "Author, \\textit{Title}, Journal, Year.\n")
-    (insert "\\end{thebibliography}\n")
-    (insert "\n\\end{document}\n")
+    (insert "\\documentclass{article}\n"
+        "\\usepackage[utf8]{inputenc}\n"
+        "\\usepackage{amsmath}\n"
+        "\\usepackage{graphicx}\n"
+        "\\usepackage{hyperref}\n"
+        "\\usepackage{geometry}\n"
+        "\\geometry{a4paper, margin=1in}\n"
+        "\n\\title{Your Title Here}\n"
+        "\\author{Your Name}\n"
+        "\\date{\\today}\n"
+        "\n\\begin{document}\n"
+        "\n\\maketitle\n"
+        "\n\\begin{abstract}\n"
+        "Your abstract here.\n"
+        "\\end{abstract}\n"
+        "\n\\section{Introduction}\n"
+        "Your introduction here.\n"
+        "\n\\section{Main Content}\n"
+        "Your main content here.\n"
+        "\n\\section{Conclusion}\n"
+        "Your conclusion here.\n"
+        "\n\\begin{thebibliography}{9}\n"
+        "\\bibitem{example}\n"
+        "Author, \\textit{Title}, Journal, Year.\n"
+        "\\end{thebibliography}\n"
+        "\n\\end{document}\n")
     (latex-mode)))
 
 ;; execute
@@ -42816,31 +42795,31 @@ When I evaluate my code block, I get this: `invalid-read-syntax`. Please fix.
 (defun insert-github-pr-template ()
   "Open a new buffer, insert a GitHub pull request template, and activate Markdown mode."
   (interactive)
-  (let* ((buffer (generate-new-buffer "PULL_REQUEST_TEMPLATE.md)))
+  (let* ((buffer (generate-new-buffer "PULL_REQUEST_TEMPLATE.md")))
     (switch-to-buffer buffer)
     (insert "# Pull Request Template\n\n")
-    (insert "## Description\n")
-    (insert "Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.\n\n")
-    (insert "Fixes # (issue)\n\n")
-    (insert "## Type of change\n")
-    (insert "Please delete options that are not relevant.\n")
-    (insert "- [ ] Bug fix (non-breaking change which fixes an issue)\n")
-    (insert "- [ ] New feature (non-breaking change which adds functionality)\n")
-    (insert "- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)\n")
-    (insert "- [ ] This change requires a documentation update\n\n")
-    (insert "## How Has This Been Tested?\n")
-    (insert "Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration.\n\n")
-    (insert "- [ ] Test A\n")
-    (insert "- [ ] Test B\n\n")
-    (insert "## Checklist:\n")
-    (insert "- [ ] My code follows the style guidelines of this project\n")
-    (insert "- [ ] I have performed a self-review of my own code\n")
-    (insert "- [ ] I have commented my code, particularly in hard-to-understand areas\n")
-    (insert "- [ ] I have made corresponding changes to the documentation\n")
-    (insert "- [ ] My changes generate no new warnings\n")
-    (insert "- [ ] I have added tests that prove my fix is effective or that my feature works\n")
-    (insert "- [ ] New and existing unit tests pass locally with my changes\n")
-    (insert "- [ ] Any dependent changes have been merged and published in downstream modules\n")
+        "## Description\n"
+        "Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.\n\n"
+        "Fixes # (issue)\n\n"
+        "## Type of change\n"
+        "Please delete options that are not relevant.\n"
+        "- [ ] Bug fix (non-breaking change which fixes an issue)\n"
+        "- [ ] New feature (non-breaking change which adds functionality)\n"
+        "- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)\n"
+        "- [ ] This change requires a documentation update\n\n"
+        "## How Has This Been Tested?\n"
+        "Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration.\n\n"
+        "- [ ] Test A\n"
+        "- [ ] Test B\n\n"
+        "## Checklist:\n"
+        "- [ ] My code follows the style guidelines of this project\n"
+        "- [ ] I have performed a self-review of my own code\n"
+        "- [ ] I have commented my code, particularly in hard-to-understand areas\n"
+        "- [ ] I have made corresponding changes to the documentation\n"
+        "- [ ] My changes generate no new warnings\n"
+        "- [ ] I have added tests that prove my fix is effective or that my feature works\n"
+        "- [ ] New and existing unit tests pass locally with my changes\n"
+        "- [ ] Any dependent changes have been merged and published in downstream modules\n")
     (markdown-mode)))
 
 ;; execute
@@ -42858,29 +42837,29 @@ This error means that your code is unbalanced, it happens when you have unclosed
   (interactive)
   (let* ((buffer (generate-new-buffer "PULL_REQUEST_TEMPLATE.md")))
     (switch-to-buffer buffer)
-    (insert "# Pull Request Template\n\n")
-    (insert "## Description\n")
-    (insert "Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.\n\n")
-    (insert "Fixes # (issue)\n\n")
-    (insert "## Type of change\n")
-    (insert "Please delete options that are not relevant.\n")
-    (insert "- [ ] Bug fix (non-breaking change which fixes an issue)\n")
-    (insert "- [ ] New feature (non-breaking change which adds functionality)\n")
-    (insert "- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)\n")
-    (insert "- [ ] This change requires a documentation update\n\n")
-    (insert "## How Has This Been Tested?\n")
-    (insert "Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration.\n\n")
-    (insert "- [ ] Test A\n")
-    (insert "- [ ] Test B\n\n")
-    (insert "## Checklist:\n")
-    (insert "- [ ] My code follows the style guidelines of this project\n")
-    (insert "- [ ] I have performed a self-review of my own code\n")
-    (insert "- [ ] I have commented my code, particularly in hard-to-understand areas\n")
-    (insert "- [ ] I have made corresponding changes to the documentation\n")
-    (insert "- [ ] My changes generate no new warnings\n")
-    (insert "- [ ] I have added tests that prove my fix is effective or that my feature works\n")
-    (insert "- [ ] New and existing unit tests pass locally with my changes\n")
-    (insert "- [ ] Any dependent changes have been merged and published in downstream modules\n")
+    (insert "# Pull Request Template\n\n"
+        "## Description\n"
+        "Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.\n\n"
+        "Fixes # (issue)\n\n"
+        "## Type of change\n"
+        "Please delete options that are not relevant.\n"
+        "- [ ] Bug fix (non-breaking change which fixes an issue)\n"
+        "- [ ] New feature (non-breaking change which adds functionality)\n"
+        "- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)\n"
+        "- [ ] This change requires a documentation update\n\n"
+        "## How Has This Been Tested?\n"
+        "Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration.\n\n"
+        "- [ ] Test A\n"
+        "- [ ] Test B\n\n"
+        "## Checklist:\n"
+        "- [ ] My code follows the style guidelines of this project\n"
+        "- [ ] I have performed a self-review of my own code\n"
+        "- [ ] I have commented my code, particularly in hard-to-understand areas\n"
+        "- [ ] I have made corresponding changes to the documentation\n"
+        "- [ ] My changes generate no new warnings\n"
+        "- [ ] I have added tests that prove my fix is effective or that my feature works\n"
+        "- [ ] New and existing unit tests pass locally with my changes\n"
+        "- [ ] Any dependent changes have been merged and published in downstream modules\n")
     (markdown-mode)))
 
 ;; execute
@@ -42897,14 +42876,15 @@ My code generates the following error: `(invalid-read-syntax "#")`. How do I fix
   "Insert a Python function template at the current cursor position."
   (interactive)
   (insert "def function_name(params):\n")
-  (insert "    \"\"\"Function description.\n\n")
-  (insert "    Args:\n")
-  (insert "        params (type): Description.\n\n)
-  (insert "    Returns:\n")
-  (insert "        type: Description.\n")
-  (insert "    \"\"\"\n")
-  (insert "    # TODO: Implement function\n")
-  (insert "    pass\n"))
+    "    \"\"\"Function description.\n\n"
+    "    Args:\n"
+    "        params (type): Description.\n\n"
+    "    Returns:\n"
+    "        type: Description.\n"
+    "    \"\"\"\n"
+    "    # TODO: Implement function\n"
+    "    pass\n"))
+
 ;; to execute M-x insert-python-function-template
 #+end_src
 
@@ -42917,15 +42897,16 @@ This error means that your code is broken, either due to the unclosed parenthesi
 (defun insert-python-function-template ()
   "Insert a Python function template at the current cursor position."
   (interactive)
-  (insert "def function_name(params):\n")
-  (insert "    \"\"\"Function description.\n\n")
-  (insert "    Args:\n")
-  (insert "        params (type): Description.\n\n")
-  (insert "    Returns:\n")
-  (insert "        type: Description.\n")
-  (insert "    \"\"\"\n")
-  (insert "    # TODO: Implement function\n")
-  (insert "    pass\n"))
+  (insert "def function_name(params):\n"
+    "    \"\"\"Function description.\n\n"
+    "    Args:\n"
+    "        params (type): Description.\n\n"
+    "    Returns:\n"
+    "        type: Description.\n"
+    "    \"\"\"\n"
+    "    # TODO: Implement function\n"
+    "    pass\n"))
+
 ;; to execute M-x insert-python-function-template
 #+end_src
 
@@ -43065,19 +43046,20 @@ I get this error: (invalid-read-syntax "#"). Why is this happening and how to fi
   (let* ((buffer-name "*TODO List*"))
     (switch-to-buffer (get-buffer-create buffer-name))
     (erase-buffer)
-    (insert "#+TITLE: TODO List\n\n")
-    (insert "* Summary\n\n")
-    (insert "* High Priority\n")
-    (insert "** TODO [#A] Task 1\n")
-    (insert "** TODO [#A] Task 2\n\n")
-    (insert "* Medium Priority\n")
-    (insert "** TODO [#B] Task 1\n")
-    (insert "** TODO [#B] Task 2\n\n")
-    (insert "* Low Priority\n)
-    (insert "** TODO [#C] Task 1\n")
-    (insert "** TODO [#C] Task 2\n\n")
+    (insert "#+TITLE: TODO List\n\n"
+        "* Summary\n\n"
+        "* High Priority\n"
+        "** TODO [#A] Task 1\n"
+        "** TODO [#A] Task 2\n\n"
+        "* Medium Priority\n"
+        "** TODO [#B] Task 1\n"
+        "** TODO [#B] Task 2\n\n"
+        "* Low Priority\n")
+        "** TODO [#C] Task 1\n"
+        "** TODO [#C] Task 2\n\n")
     (org-mode)
     (goto-char (point-min))))
+
 
 ;; Bind the function to a key for easy access
 (global-set-key (kbd "C-c t") 'create-org-todo-template)
@@ -43095,17 +43077,17 @@ This error indicates that you have broken string quotes or not properly closed p
   (let* ((buffer-name "*TODO List*"))
     (switch-to-buffer (get-buffer-create buffer-name))
     (erase-buffer)
-    (insert "#+TITLE: TODO List\n\n")
-    (insert "* Summary\n\n")
-    (insert "* High Priority\n")
-    (insert "** TODO [#A] Task 1\n")
-    (insert "** TODO [#A] Task 2\n\n")
-    (insert "* Medium Priority\n")
-    (insert "** TODO [#B] Task 1\n")
-    (insert "** TODO [#B] Task 2\n\n")
-    (insert "* Low Priority\n")
-    (insert "** TODO [#C] Task 1\n")
-    (insert "** TODO [#C] Task 2\n\n")
+    (insert "#+TITLE: TODO List\n\n"
+        "* Summary\n\n"
+        "* High Priority\n"
+        "** TODO [#A] Task 1\n"
+        "** TODO [#A] Task 2\n\n"
+        "* Medium Priority\n"
+        "** TODO [#B] Task 1\n"
+        "** TODO [#B] Task 2\n\n"
+        "* Low Priority\n"
+        "** TODO [#C] Task 1\n"
+        "** TODO [#C] Task 2\n\n")
     (org-mode)
     (goto-char (point-min))))
 
@@ -43139,9 +43121,9 @@ Why do I get this error when I try to evaluate my code: "org-babel-execute:elisp
              (start-time time-tracking-start-time)
              (duration (float-time (time-subtract end-time start-time))))
         (with-temp-buffer
-          (insert (format "Task started at: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S" start-time)))
-          (insert (format "Task ended at: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S" end-time)))
-          (insert (format "Duration: %.2f seconds\n\n" duration))
+          (insert (format "Task started at: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S" start-time))
+                (format "Task ended at: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S" end-time))
+                (format "Duration: %.2f seconds\n\n" duration))
           (append-to-file (point-min) (point-max) time-tracking-log-file))
         (setq time-tracking-start-time nil)
         (message "Time tracking stopped. Duration: %.2f seconds" duration))
@@ -43177,9 +43159,9 @@ This error indicates that your code is malformed and it could not be parsed. You
              (start-time time-tracking-start-time)
              (duration (float-time (time-subtract end-time start-time))))
         (with-temp-buffer
-          (insert (format "Task started at: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S" start-time)))
-          (insert (format "Task ended at: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S" end-time)))
-          (insert (format "Duration: %.2f seconds\n\n" duration))
+          (insert (format "Task started at: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S" start-time))
+                (format "Task ended at: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S" end-time))
+                (format "Duration: %.2f seconds\n\n" duration))
           (append-to-file (point-min) (point-max) time-tracking-log-file))
         (setq time-tracking-start-time nil)
         (message "Time tracking stopped. Duration: %.2f seconds" duration))
@@ -43199,20 +43181,20 @@ What does this error mean: "End of file during parsing"? Please fix.
   "Insert a standardized header at the beginning of a script file."
   (interactive)
   (let* ((script-name (read-string "Script Name: "))
-        (author (read-string "Author: "))
+        (author (read-string "Author: ))
         (date (format-time-string "%Y-%m-%d"))
         (description (read-string "Description: "))
         (usage (read-string "Usage: ")))
     (goto-char (point-min))
-    (insert (format "#!/bin/bash\n"))
-    (insert (format "# %s\n" (make-string 70 ?#)))
-    (insert (format "# Script Name: %s\n" script-name))
-    (insert (format "# Author: %s\n" author))
-    (insert (format "# Date: %s\n" date))
-    (insert (format "# Description: %s\n" description))
-    (insert (format "# Usage: %s\n" usage))
-    (insert (format "# %s\n (make-string 70 ?#)))
-    (insert "\n")))
+    (insert (format "#!/bin/bash\n")
+        (format "# %s\n" (make-string 70 ?#))
+        (format "# Script Name: %s\n" script-name)
+        (format "# Author: %s\n" author)
+        (format "# Date: %s\n" date)
+        (format "# Description: %s\n" description)
+        (format "# Usage: %s\n" usage)
+        (format "# %s\n" (make-string 70 ?#))
+        "\n")))
 
 (global-set-key (kbd "C-c h") 'insert-script-header)
 #+end_src
@@ -43232,15 +43214,15 @@ Your code has broken string, and for this reason cannot be parsed properly. Here
         (description (read-string "Description: "))
         (usage (read-string "Usage: ")))
     (goto-char (point-min))
-    (insert (format "#!/bin/bash\n"))
-    (insert (format "# %s\n" (make-string 70 ?#)))
-    (insert (format "# Script Name: %s\n" script-name))
-    (insert (format "# Author: %s\n" author))
-    (insert (format "# Date: %s\n" date))
-    (insert (format "# Description: %s\n" description))
-    (insert (format "# Usage: %s\n" usage))
-    (insert (format "# %s\n" (make-string 70 ?#)))
-    (insert "\n")))
+    (insert (format "#!/bin/bash\n")
+        (format "# %s\n" (make-string 70 ?#))
+        (format "# Script Name: %s\n" script-name)
+        (format "# Author: %s\n" author)
+        (format "# Date: %s\n" date)
+        (format "# Description: %s\n" description)
+        (format "# Usage: %s\n" usage)
+        (format "# %s\n" (make-string 70 ?#))
+        "\n")))
 
 (global-set-key (kbd "C-c h") 'insert-script-header)
 #+end_src
@@ -44735,11 +44717,11 @@ This code does not work: `org-babel-execute:elisp: End of file during parsing`.
                        (publish-date (alist-get 'publish_date book-data))
                        (number-of-pages (alist-get 'number_of_pages book-data))
                        (cover-url (alist-get 'cover book-data)))
-                   (insert (format "* Title: %s\n" title))
-                   (insert (format "* Authors: %s\n" (string-join authors ", ")))
-                   (insert (format "* Publishers: %s\n" (string-join publishers ", ")))
-                   (insert (format "* Publish Date: %s\n" publish-date))
-                   (insert (format "* Number of Pages: %d\n" number-of-pages))
+                   (insert (format "* Title: %s\n" title)
+                        (format "* Authors: %s\n" (string-join authors ", "))
+                        (format "* Publishers: %s\n" (string-join publishers ", "))
+                        (format "* Publish Date: %s\n" publish-date)
+                        (format "* Number of Pages: %d\n" number-of-pages))
                    (when cover-url
                      (insert (format "* Cover URL: %s\n" (alist-get 'large cover-url))))))
                  (org-mode)
@@ -44786,11 +44768,11 @@ The code does not work because it contains unbalanced double quotes, resulting i
                        (publish-date (alist-get 'publish_date book-data))
                        (number-of-pages (alist-get 'number_of_pages book-data))
                        (cover-url (alist-get 'cover book-data)))
-                   (insert (format "* Title: %s\n" title))
-                   (insert (format "* Authors: %s\n" (string-join authors ", ")))
-                   (insert (format "* Publishers: %s\n" (string-join publishers ", ")))
-                   (insert (format "* Publish Date: %s\n" publish-date))
-                   (insert (format "* Number of Pages: %d\n" number-of-pages))
+                   (insert (format "* Title: %s\n" title)
+                        (format "* Authors: %s\n" (string-join authors ", "))
+                        (format "* Publishers: %s\n" (string-join publishers ", "))
+                        (format "* Publish Date: %s\n" publish-date)
+                        (format "* Number of Pages: %d\n" number-of-pages))
                    (when cover-url
                      (insert (format "* Cover URL: %s\n" (alist-get 'large cover-url))))))
                  (org-mode)
@@ -44826,9 +44808,9 @@ When I run this code I get: End of file during parsing. Please suggest a fix.
            (let* ((json-data (json-read)))
              (with-current-buffer output-buffer
                (erase-buffer)
-               (insert (format "#+TITLE: Random Joke\n\n"))
-               (insert (format "* Setup: %s\n (alist-get 'setup json-data)))
-               (insert (format "* Punchline: %s\n" (alist-get 'punchline json-data)))
+               (insert (format "#+TITLE: Random Joke\n\n")
+                    (format "* Setup: %s\n (alist-get 'setup json-data))
+                    (format "* Punchline: %s\n" (alist-get 'punchline json-data)))
                (org-mode)
                (goto-char (point-min))
                (display-buffer output-buffer)))))))))
@@ -44863,9 +44845,9 @@ The code is broken because it contains unbalanced double quotes, which result in
            (let* ((json-data (json-read)))
              (with-current-buffer output-buffer
                (erase-buffer)
-               (insert (format "#+TITLE: Random Joke\n\n"))
-               (insert (format "* Setup: %s\n" (alist-get 'setup json-data)))
-               (insert (format "* Punchline: %s\n" (alist-get 'punchline json-data)))
+               (insert (format "#+TITLE: Random Joke\n\n")
+                    (format "* Setup: %s\n" (alist-get 'setup json-data))
+                    (format "* Punchline: %s\n" (alist-get 'punchline json-data)))
                (org-mode)
                (goto-char (point-min))
                (display-buffer output-buffer)))))))))
@@ -44905,8 +44887,8 @@ This code cannot be parsed for some reason. This is the error message: End of fi
                   (comic-alt (alist-get 'alt json-data)))
              (with-current-buffer output-buffer
                (erase-buffer)
-               (insert (format "#+TITLE: XKCD Comic #%s - %s\n\n comic-num comic-title))
-               (insert (format "* Alt Text: %s\n\n" comic-alt))
+               (insert (format "#+TITLE: XKCD Comic #%s - %s\n\n comic-num comic-title)
+                    (format "* Alt Text: %s\n\n" comic-alt))
                (let* ((image-file (concat temporary-file-directory "xkcd.png")))
                  (url-copy-file comic-url image-file t)
                  (insert (format "[[file:%s]]\n" image-file))
@@ -44950,8 +44932,8 @@ The code cannot be parsed because it contains broken strings, due to the unbalan
                   (comic-alt (alist-get 'alt json-data)))
              (with-current-buffer output-buffer
                (erase-buffer)
-               (insert (format "#+TITLE: XKCD Comic #%s - %s\n\n" comic-num comic-title))
-               (insert (format "* Alt Text: %s\n\n" comic-alt))
+               (insert (format "#+TITLE: XKCD Comic #%s - %s\n\n" comic-num comic-title)
+                    (format "* Alt Text: %s\n\n" comic-alt))
                (let* ((image-file (concat temporary-file-directory "xkcd.png")))
                  (url-copy-file comic-url image-file t)
                  (insert (format "[[file:%s]]\n" image-file))
@@ -44996,8 +44978,8 @@ This code cannot be parsed properly. The message is: End of file during parsing.
                  (let* ((question-text (alist-get 'question question))
                        (correct-answer (alist-get 'correct_answer question))
                        (incorrect-answers (alist-get 'incorrect_answers question)))
-                   (insert (format "* Question: %s\n question-text))
-                   (insert (format "  - Correct Answer: %s\n" correct-answer))
+                   (insert (format "* Question: %s\n question-text)
+                        (format "  - Correct Answer: %s\n" correct-answer))
                    (dolist (answer incorrect-answers)
                      (insert (format "  - Incorrect Answer: %s\n" answer)))
                    (insert "\n")))
@@ -45041,8 +45023,8 @@ The code is broken due to a malformed string. Here is the version of the code wi
                  (let* ((question-text (alist-get 'question question))
                        (correct-answer (alist-get 'correct_answer question))
                        (incorrect-answers (alist-get 'incorrect_answers question)))
-                   (insert (format "* Question: %s\n" question-text))
-                   (insert (format "  - Correct Answer: %s\n" correct-answer))
+                   (insert (format "* Question: %s\n" question-text)
+                        (format "  - Correct Answer: %s\n" correct-answer))
                    (dolist (answer incorrect-answers)
                      (insert (format "  - Incorrect Answer: %s\n" answer)))
                    (insert "\n")))
@@ -45082,15 +45064,15 @@ There is this issue with the code: "org-babel-execute:elisp: End of file during 
            (let* ((json-data (json-read)))
              (with-current-buffer output-buffer
                (erase-buffer)
-               (insert (format "#+TITLE: GitHub Repository Information: %s/%s\n\n" owner repo))
-               (insert (format "* Name: %s\n (alist-get 'name json-data)))
-               (insert (format "* Description: %s\n" (alist-get 'description json-data)))
-               (insert (format "* Owner: %s\n" (alist-get 'login (alist-get 'owner json-data))))
-               (insert (format "* Stars: %d\n" (alist-get 'stargazers_count json-data)))
-               (insert (format "* Forks: %d\n" (alist-get 'forks_count json-data)))
-               (insert (format "* Open Issues: %d\n" (alist-get 'open_issues_count json-data)))
-               (insert (format "* Language: %s\n" (alist-get 'language json-data)))
-               (insert (format "* URL: %s\n" (alist-get 'html_url json-data)))
+               (insert (format "#+TITLE: GitHub Repository Information: %s/%s\n\n" owner repo)
+                    (format "* Name: %s\n (alist-get 'name json-data))
+                    (format "* Description: %s\n" (alist-get 'description json-data))
+                    (format "* Owner: %s\n" (alist-get 'login (alist-get 'owner json-data)))
+                    (format "* Stars: %d\n" (alist-get 'stargazers_count json-data))
+                    (format "* Forks: %d\n" (alist-get 'forks_count json-data))
+                    (format "* Open Issues: %d\n" (alist-get 'open_issues_count json-data))
+                    (format "* Language: %s\n" (alist-get 'language json-data))
+                    (format "* URL: %s\n" (alist-get 'html_url json-data)))
                (org-mode)
                (goto-char (point-min))
                (display-buffer output-buffer)))))))))
@@ -45127,15 +45109,15 @@ The error indicates that the code cannot be parsed. This usually happens because
            (let* ((json-data (json-read)))
              (with-current-buffer output-buffer
                (erase-buffer)
-               (insert (format "#+TITLE: GitHub Repository Information: %s/%s\n\n" owner repo))
-               (insert (format "* Name: %s\n" (alist-get 'name json-data)))
-               (insert (format "* Description: %s\n" (alist-get 'description json-data)))
-               (insert (format "* Owner: %s\n" (alist-get 'login (alist-get 'owner json-data))))
-               (insert (format "* Stars: %d\n" (alist-get 'stargazers_count json-data)))
-               (insert (format "* Forks: %d\n" (alist-get 'forks_count json-data)))
-               (insert (format "* Open Issues: %d\n" (alist-get 'open_issues_count json-data)))
-               (insert (format "* Language: %s\n" (alist-get 'language json-data)))
-               (insert (format "* URL: %s\n" (alist-get 'html_url json-data)))
+               (insert (format "#+TITLE: GitHub Repository Information: %s/%s\n\n" owner repo)
+                    (format "* Name: %s\n" (alist-get 'name json-data))
+                    (format "* Description: %s\n" (alist-get 'description json-data))
+                    (format "* Owner: %s\n" (alist-get 'login (alist-get 'owner json-data)))
+                    (format "* Stars: %d\n" (alist-get 'stargazers_count json-data))
+                    (format "* Forks: %d\n" (alist-get 'forks_count json-data))
+                    (format "* Open Issues: %d\n" (alist-get 'open_issues_count json-data))
+                    (format "* Language: %s\n" (alist-get 'language json-data))
+                    (format "* URL: %s\n" (alist-get 'html_url json-data)))
                (org-mode)
                (goto-char (point-min))
                (display-buffer output-buffer)))))))))
@@ -45172,8 +45154,8 @@ This code cannot be parsed: End of file during parsing.
              (let* ((image-url (alist-get 'message json-data)))
                (with-current-buffer output-buffer
                  (erase-buffer)
-                 (insert (format "#+TITLE: Random Dog Image\n\n))
-                 (insert (format "[[file:/tmp/%s]]\n" (file-name-nondirectory (url-unhex-string image-url))))
+                 (insert (format "#+TITLE: Random Dog Image\n\n)
+                        (format "[[file:/tmp/%s]]\n" (file-name-nondirectory (url-unhex-string image-url))))
                  (url-copy-file image-url (concat "/tmp/" (file-name-nondirectory (url-unhex-string image-url))) t)
                  (org-mode)
                  (goto-char (point-min))
@@ -45212,8 +45194,8 @@ The code cannot be parsed because it contains unbalanced double quotes resulting
              (let* ((image-url (alist-get 'message json-data)))
                (with-current-buffer output-buffer
                  (erase-buffer)
-                 (insert (format "#+TITLE: Random Dog Image\n\n"))
-                 (insert (format "[[file:/tmp/%s]]\n" (file-name-nondirectory (url-unhex-string image-url))))
+                 (insert (format "#+TITLE: Random Dog Image\n\n")
+                        (format "[[file:/tmp/%s]]\n" (file-name-nondirectory (url-unhex-string image-url))))
                  (url-copy-file image-url (concat "/tmp/" (file-name-nondirectory (url-unhex-string image-url))) t)
                  (org-mode)
                  (goto-char (point-min))

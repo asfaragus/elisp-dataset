@@ -2888,7 +2888,7 @@ Monitor the directory "~/my-project" for any changes (creation, modification, de
 Ok! You can execute the following block of code in order to monitor the 'my-project' directory in your home directory. I will place the logs inside the '*Directory-Changes-Log*' buffer.
 
 #+begin_src elisp
-;; -*- lexical-binding: t; -*-
+(require 'cl-lib)
 
 (defun monitor-directory-changes (dir log-buffer-name)
   "Monitor the directory DIR for changes and log them to LOG-BUFFER-NAME."
@@ -2954,6 +2954,7 @@ Sure thing! Please evaluate the following code block in order to download the la
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-stackoverflow-questions (tag)
   "Fetch the latest 5 questions from Stack Overflow with the specified TAG and display them in an Org buffer."
@@ -3004,6 +3005,9 @@ Sure thing! Please evaluate the following code block in order to download the la
 ;; execute
 (fetch-stackoverflow-questions "emacs")
 #+end_src
+
+#+RESULTS:
+: #<buffer  *http api.stackexchange.com:443*-270622>
 
 * Example 98: Toggle Frame Transparency
 ** instruction
@@ -3091,6 +3095,7 @@ Got it! Please run the following block code to download the latest earthquake in
 #+begin_src elisp
 (require 'json)
 (require 'url)
+(require 'cl-lib)
 
 (defun fetch-latest-earthquakes ()
   "Fetch the latest earthquakes from the USGS and display them in an Org buffer."
@@ -3140,6 +3145,7 @@ Please run the code below to fetch the latest statistics about the COVID-19 and 
 #+begin_src elisp
 (require 'json)
 (require 'url)
+(require 'cl-lib)
 
 (defun fetch-latest-covid19-stats ()
   "Fetch the latest global COVID-19 statistics and display them in an Org buffer."
@@ -3196,6 +3202,7 @@ Here is the code for fetching the top five results about "Japanese culture" from
 (require 'url)
 (require 'json)
 (require 'org)
+(require 'cl-lib)
 
 (defun fetch-duckduckgo-search-results (query)
   "Fetch the top 5 DuckDuckGo search results for the specified QUERY and display them in an Org buffer."
@@ -4322,6 +4329,7 @@ Here is a function that fetches the top 5 popular movies from an online API and 
 (require 'url)
 (require 'json)
 (require 'org)
+(require 'cl-lib)
 
 (defun fetch-popular-movies ()
   "Fetch the top 5 popular movies and display them in an Org buffer."
@@ -4387,6 +4395,7 @@ Here is a function that fetches the English translation of a Japanese sentence f
 (require 'url)
 (require 'org)
 (require 'dom)
+(require 'cl-lib)
 
 (defun fetch-jisho-definition (sentence)
   "Fetch the definition of a Japanese sentence from Jisho.org and display it in an Org buffer."
@@ -5947,6 +5956,7 @@ This function allows you to fetch the latest 5 posts from a specified subreddit,
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-latest-reddit-posts (subreddit)
   "Fetch the latest 5 posts from the specified SUBREDDIT and display them in an Org buffer."
@@ -5998,6 +6008,7 @@ This function fetches and displays detailed information about a book using its I
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-book-info (isbn)
   "Fetch information about a book using its ISBN and display it in an Org buffer."
@@ -6054,6 +6065,7 @@ This function fetches a random joke from the web and displays it in an Org buffe
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-random-jokes ()
   "Fetch a random joke and display it in an Org buffer."
@@ -6103,6 +6115,7 @@ Let me know if you have any other questions.
 (require 'url)
 (require 'url-http)
 (require 'url-cache)
+(require 'cl-lib)
 
 (defun fetch-latest-xkcd ()
   "Fetch the latest XKCD comic and display it in an Org buffer."
@@ -6164,6 +6177,7 @@ Feel free to test it out and expand your knowledge with some random trivia!
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-random-trivia ()
   "Fetch random trivia questions and display them in an Org buffer."
@@ -6229,6 +6243,7 @@ Let me know if you have any other questions!
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-github-repo-info (owner repo)
   "Fetch information about a GitHub repository and display it in an Org buffer."
@@ -6287,6 +6302,7 @@ buffer. No need to open any external applications!
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-random-dog-image ()
   "Fetch a random dog image from the Dog CEO's Dog API and display it in an Org buffer."
@@ -12883,6 +12899,7 @@ You can start the function any time you need using
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-hacker-news-top-stories ()
   "Fetch top stories from Hacker News and display them in an Org buffer."
@@ -13317,7 +13334,7 @@ change notifications directly to the specified Emacs buffer, making it
 easy to track what's happening within the directory in real time.
 
 #+begin_src elisp
-;; -*- lexical-binding: t; -*-
+(require 'cl-lib)
 
 (defun monitor-directory-changes (dir log-buffer-name)
   "Monitor the directory DIR for changes and log them to LOG-BUFFER-NAME."
@@ -13394,6 +13411,7 @@ displaying the fetched questions right away.
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-stackoverflow-questions (tag)
   "Fetch the latest 5 questions from Stack Overflow with the specified TAG and display them in an Org buffer."
@@ -13536,6 +13554,7 @@ information.
 #+begin_src elisp
 (require 'json)
 (require 'url)
+(require 'cl-lib)
 
 (defun fetch-latest-earthquakes ()
   "Fetch the latest earthquakes from the USGS and display them in an Org buffer."
@@ -13588,6 +13607,7 @@ fetch-latest-covid19-stats` to keep your data up-to-date.
 #+begin_src elisp
 (require 'json)
 (require 'url)
+(require 'cl-lib)
 
 (defun fetch-latest-covid19-stats ()
   "Fetch the latest global COVID-19 statistics and display them in an Org buffer."
@@ -13648,6 +13668,7 @@ wish. The results will be displayed in a similar format.
 (require 'url)
 (require 'json)
 (require 'org)
+(require 'cl-lib)
 
 (defun fetch-duckduckgo-search-results (query)
   "Fetch the top 5 DuckDuckGo search results for the specified QUERY and display them in an Org buffer."
@@ -14804,6 +14825,7 @@ In order to fetch the top 5 popular movies from the JSON API and display them in
 (require 'url)
 (require 'json)
 (require 'org)
+(require 'cl-lib)
 
 (defun fetch-popular-movies ()
   "Fetch the top 5 popular movies and display them in an Org buffer."
@@ -14869,6 +14891,7 @@ Understood! The following block of code allows you to fetch the English definiti
 (require 'url)
 (require 'org)
 (require 'dom)
+(require 'cl-lib)
 
 (defun fetch-jisho-definition (sentence)
   "Fetch the definition of a Japanese sentence from Jisho.org and display it in an Org buffer."
@@ -16576,6 +16599,7 @@ subreddits by replacing `"emacs"` with the desired subreddit name.
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-latest-reddit-posts (subreddit)
   "Fetch the latest 5 posts from the specified SUBREDDIT and display them in an Org buffer."
@@ -16628,6 +16652,7 @@ ISBNs by replacing `"978-1590301340"` with the desired ISBN code.
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-book-info (isbn)
   "Fetch information about a book using its ISBN and display it in an Org buffer."
@@ -16686,6 +16711,7 @@ You can use `M-x fetch-random-jokes` to get a new random joke anytime.
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-random-jokes ()
   "Fetch a random joke and display it in an Org buffer."
@@ -16737,6 +16763,7 @@ the latest XKCD comic.
 (require 'url)
 (require 'url-http)
 (require 'url-cache)
+(require 'cl-lib)
 
 (defun fetch-latest-xkcd ()
   "Fetch the latest XKCD comic and display it in an Org buffer."
@@ -16794,6 +16821,7 @@ view the trivia questions.
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-random-trivia ()
   "Fetch random trivia questions and display them in an Org buffer."
@@ -16852,6 +16880,7 @@ the repository details when prompted.
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-github-repo-info (owner repo)
   "Fetch information about a GitHub repository and display it in an Org buffer."
@@ -16905,6 +16934,7 @@ download more dog images.
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-random-dog-image ()
   "Fetch a random dog image from the Dog CEO's Dog API and display it in an Org buffer."
@@ -38648,6 +38678,7 @@ Why do I get the message "Symbol’s function definition is void: delete-buffer"
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-hacker-news-top-stories ()
   "Fetch top stories from Hacker News and display them in an Org buffer."
@@ -38711,6 +38742,7 @@ This happens because the `delete-buffer` function does not exist. In order to de
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-hacker-news-top-stories ()
   "Fetch top stories from Hacker News and display them in an Org buffer."
@@ -39353,7 +39385,7 @@ This error happens because the function `generate-html-report` has not been clos
 The code causes the following runtime error: (void-function run-process). Please provide the fixed code.
 
 #+begin_src elisp
-;; -*- lexical-binding: t; -*-
+(require 'cl-lib)
 
 (defun monitor-directory-changes (dir log-buffer-name)
   "Monitor the directory DIR for changes and log them to LOG-BUFFER-NAME."
@@ -39380,7 +39412,7 @@ The code causes the following runtime error: (void-function run-process). Please
 The error: `void-function run-process` indicates that the function `run-process` does not exist. You should use the `start-process` function in order to run your local processes. Here is the fixed version of your code:
 
 #+begin_src elisp
-;; -*- lexical-binding: t; -*-
+(require 'cl-lib)
 
 (defun monitor-directory-changes (dir log-buffer-name)
   "Monitor the directory DIR for changes and log them to LOG-BUFFER-NAME."
@@ -39460,6 +39492,7 @@ Why is my code not working? I get this error message: End of file during parsing
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-stackoverflow-questions (tag)
   "Fetch the latest 5 questions from Stack Overflow with the specified TAG and display them in an Org buffer."
@@ -39520,6 +39553,7 @@ The code does not work because you have unbalanced parenthesis in your code. The
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-stackoverflow-questions (tag)
   "Fetch the latest 5 questions from Stack Overflow with the specified TAG and display them in an Org buffer."
@@ -39687,6 +39721,7 @@ Please fix the following issue: `org-babel-execute:elisp: End of file during par
 #+begin_src elisp
 (require 'json)
 (require 'url)
+(require 'cl-lib)
 
 (defun fetch-latest-earthquakes ()
   "Fetch the latest earthquakes from the USGS and display them in an Org buffer."
@@ -39731,6 +39766,7 @@ This error happens because you have unbalanced parenthesis in your code. Here is
 #+begin_src elisp
 (require 'json)
 (require 'url)
+(require 'cl-lib)
 
 (defun fetch-latest-earthquakes ()
   "Fetch the latest earthquakes from the USGS and display them in an Org buffer."
@@ -39775,6 +39811,7 @@ Why do I get this error: (void-variable covid-data)? Provide a fix please.
 #+begin_src elisp
 (require 'json)
 (require 'url)
+(require 'cl-lib)
 
 (defun fetch-latest-covid19-stats ()
   "Fetch the latest global COVID-19 statistics and display them in an Org buffer."
@@ -39825,6 +39862,7 @@ The error `void-variable covid-data` indicates that you are referencing the vari
 #+begin_src elisp
 (require 'json)
 (require 'url)
+(require 'cl-lib)
 
 (defun fetch-latest-covid19-stats ()
   "Fetch the latest global COVID-19 statistics and display them in an Org buffer."
@@ -39876,6 +39914,7 @@ Can you fix the code below? It causes this error: `void-variable url-hexify-stri
 (require 'url)
 (require 'json)
 (require 'org)
+(require 'cl-lib)
 
 (defun fetch-duckduckgo-search-results (query)
   "Fetch the top 5 DuckDuckGo search results for the specified QUERY and display them in an Org buffer."
@@ -39941,6 +39980,7 @@ The error `void-variable url-hexify-string` indicates that the variable `url-hex
 (require 'url)
 (require 'json)
 (require 'org)
+(require 'cl-lib)
 
 (defun fetch-duckduckgo-search-results (query)
   "Fetch the top 5 DuckDuckGo search results for the specified QUERY and display them in an Org buffer."
@@ -41764,6 +41804,7 @@ Running the following code triggers the error: (void-variable name). How to fix 
 (require 'url)
 (require 'json)
 (require 'org)
+(require 'cl-lib)
 
 (defun fetch-popular-movies ()
   "Fetch the top 5 popular movies and display them in an Org buffer."
@@ -41824,6 +41865,7 @@ The error `void-variable name` indicates that the variable `name` has not been d
 (require 'url)
 (require 'json)
 (require 'org)
+(require 'cl-lib)
 
 (defun fetch-popular-movies ()
   "Fetch the top 5 popular movies and display them in an Org buffer."
@@ -41884,6 +41926,7 @@ When I run this code I get the following error: End of file during parsing. Plea
 (require 'url)
 (require 'org)
 (require 'dom)
+(require 'cl-lib)
 
 (defun fetch-jisho-definition (sentence)
   "Fetch the definition of a Japanese sentence from Jisho.org and display it in an Org buffer."
@@ -41930,6 +41973,7 @@ It appears that your `fetch-jisho-definition` function has not been closed prope
 (require 'url)
 (require 'org)
 (require 'dom)
+(require 'cl-lib)
 
 (defun fetch-jisho-definition (sentence)
   "Fetch the definition of a Japanese sentence from Jisho.org and display it in an Org buffer."
@@ -44601,6 +44645,7 @@ This error is very confusing: (invalid-read-syntax "#"). What is going on and ho
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-latest-reddit-posts (subreddit)
   "Fetch the latest 5 posts from the specified SUBREDDIT and display them in an Org buffer."
@@ -44645,6 +44690,7 @@ Your code has broken strings because you have unbalanced double quotes in your c
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-latest-reddit-posts (subreddit)
   "Fetch the latest 5 posts from the specified SUBREDDIT and display them in an Org buffer."
@@ -44689,6 +44735,7 @@ This code does not work: `org-babel-execute:elisp: End of file during parsing`.
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-book-info (isbn)
   "Fetch information about a book using its ISBN and display it in an Org buffer."
@@ -44740,6 +44787,7 @@ The code does not work because it contains unbalanced double quotes, resulting i
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-book-info (isbn)
   "Fetch information about a book using its ISBN and display it in an Org buffer."
@@ -44791,6 +44839,7 @@ When I run this code I get: End of file during parsing. Please suggest a fix.
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-random-jokes ()
   "Fetch a random joke and display it in an Org buffer."
@@ -44828,6 +44877,7 @@ The code is broken because it contains unbalanced double quotes, which result in
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-random-jokes ()
   "Fetch a random joke and display it in an Org buffer."
@@ -44866,6 +44916,7 @@ This code cannot be parsed for some reason. This is the error message: End of fi
 (require 'url)
 (require 'url-http)
 (require 'url-cache)
+(require 'cl-lib)
 
 (defun fetch-latest-xkcd ()
   "Fetch the latest XKCD comic and display it in an Org buffer."
@@ -44911,6 +44962,7 @@ The code cannot be parsed because it contains broken strings, due to the unbalan
 (require 'url)
 (require 'url-http)
 (require 'url-cache)
+(require 'cl-lib)
 
 (defun fetch-latest-xkcd ()
   "Fetch the latest XKCD comic and display it in an Org buffer."
@@ -44955,6 +45007,7 @@ This code cannot be parsed properly. The message is: End of file during parsing.
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-random-trivia ()
   "Fetch random trivia questions and display them in an Org buffer."
@@ -45000,6 +45053,7 @@ The code is broken due to a malformed string. Here is the version of the code wi
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-random-trivia ()
   "Fetch random trivia questions and display them in an Org buffer."
@@ -45045,6 +45099,7 @@ There is this issue with the code: "org-babel-execute:elisp: End of file during 
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-github-repo-info (owner repo)
   "Fetch information about a GitHub repository and display it in an Org buffer."
@@ -45090,6 +45145,7 @@ The error indicates that the code cannot be parsed. This usually happens because
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-github-repo-info (owner repo)
   "Fetch information about a GitHub repository and display it in an Org buffer."
@@ -45135,6 +45191,7 @@ This code cannot be parsed: End of file during parsing.
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-random-dog-image ()
   "Fetch a random dog image from the Dog CEO's Dog API and display it in an Org buffer."
@@ -45175,6 +45232,7 @@ The code cannot be parsed because it contains unbalanced double quotes resulting
 (require 'json)
 (require 'url)
 (require 'url-http)
+(require 'cl-lib)
 
 (defun fetch-random-dog-image ()
   "Fetch a random dog image from the Dog CEO's Dog API and display it in an Org buffer."
